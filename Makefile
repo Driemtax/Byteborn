@@ -14,15 +14,15 @@ test:
 
 .PHONY: build
 build: vet
-	go build -o byteborn ./cmd/byteborn/main.go
+	go build -o byteborn-game ./cmd/byteborn/main.go
 
 .PHONY: start
 start: build
-	./byteborn
+	./byteborn-game
 
 commit: test
 	git commit
 
 .PHONY: clean
 clean:
-	rm -rf ./byteborn
+	rm -rf ./byteborn-game
