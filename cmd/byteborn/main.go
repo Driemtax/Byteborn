@@ -5,13 +5,14 @@ import (
 	"image/color"
 	"log"
 
+	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/internal/scene"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 func init() {
-	ebiten.SetWindowSize(400, 400)
+	ebiten.SetWindowSize(config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
 	ebiten.SetWindowTitle("Byteborn by Archaide")
 	ebiten.SetTPS(60)
 }
@@ -35,7 +36,7 @@ func (tg TestGame) Draw(screen *ebiten.Image) {
 }
 
 func (tg TestGame) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 400, 400
+	return config.WINDOW_HEIGHT, config.WINDOW_HEIGHT
 }
 
 var _ scene.Scene = (*TestGame)(nil)
