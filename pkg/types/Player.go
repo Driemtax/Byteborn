@@ -1,37 +1,39 @@
 package types
 
-import "fmt"
-
 type Player struct {
-	Posx int
-	Posy int
+	SizeX int
+	SizeY int
+	Posx  int
+	Posy  int
 }
 
 func NewPlayer() *Player {
 	return &Player{
-		Posx: 180,
-		Posy: 180,
+		SizeX: 40,
+		SizeY: 40,
+		Posx:  380,
+		Posy:  380,
 	}
 }
 
 func (p *Player) Move(d Direction) error {
 	switch d {
+	case UNDEFINED:
 	case UP:
-		fmt.Println("Moving up..", p.Posy)
-		if p.Posy >= 10 {
+		// if u ask yourself why i subtracted 10 here, you asked a very good question, but it works so get on with it :)
+		if p.Posy >= (p.SizeY/2)-10 {
 			p.Posy -= 10
-			fmt.Println("Moved to:", p.Posy)
 		}
 	case DOWN:
-		if p.Posy <= 389 {
+		if p.Posy <= 790-(p.SizeY) {
 			p.Posy += 10
 		}
 	case LEFT:
-		if p.Posx >= 10 {
+		if p.Posx >= (p.SizeX/2)-10 {
 			p.Posx -= 10
 		}
 	case RIGHT:
-		if p.Posx <= 390 {
+		if p.Posx <= 790-(p.SizeX) {
 			p.Posx += 10
 		}
 	}
