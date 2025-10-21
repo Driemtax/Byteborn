@@ -23,3 +23,10 @@ func Clamp(pos types.Vector2D, minX, minY, maxX, maxY float64) types.Vector2D {
 	}
 	return pos
 }
+
+func IsInPointsSquare(pos types.Vec2, topLeft types.Vec2, botRight types.Vec2) bool {
+	if pos.Le(topLeft) && pos.Se(botRight) {
+		return true
+	}
+	return false
+}
