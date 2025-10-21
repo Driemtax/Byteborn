@@ -5,6 +5,8 @@ type Vector2D struct {
 	Y float64
 }
 
+type Vec2 = Vector2D
+
 func NewVector2D(x, y float64) Vector2D {
 	return Vector2D{
 		X: x,
