@@ -1,21 +1,21 @@
 package types
 
-type Direction int
+type Direction int8
 
 const (
-	UP Direction = iota
+	UNDEFINED Direction = iota
+	UP
 	DOWN
 	LEFT
 	RIGHT
-	UNDEFINED
 )
 
 var directionName = map[Direction]string{
+	UNDEFINED: "undefined",
 	UP:        "up",
 	DOWN:      "down",
 	LEFT:      "left",
 	RIGHT:     "right",
-	UNDEFINED: "undefined",
 }
 
 func (d Direction) String() string {
