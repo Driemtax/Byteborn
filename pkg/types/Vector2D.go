@@ -12,6 +12,13 @@ type Vector2D struct {
 
 type Vec2 = Vector2D
 
+func NewVector2D(x, y float64) Vector2D {
+	return Vector2D{
+		X: x,
+		Y: y,
+	}
+}
+
 func (v Vec2) String() string {
 	return fmt.Sprintf("Vec2{X: %f, Y: %f}", v.X, v.Y)
 }
