@@ -106,7 +106,6 @@ func (cn *ChunkNode) GetChunksTouchingSquare(tl, br types.Vec2) []*Chunk {
 }
 
 func (cn *ChunkNode) GetChunkNodesTouchingSquare(tl, br types.Vec2) []*ChunkNode {
-	fmt.Println("ChunkNodesSearchPositions: ", tl, br)
 	if !cn.TouchesSq(tl, br) {
 		return []*ChunkNode{}
 	}

@@ -1,7 +1,6 @@
 package world
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/Driemtax/Byteborn/internal/config"
@@ -21,7 +20,6 @@ type World struct {
 func NewWorld() *World {
 	maxChunkAmount := math.Pow(2, config.CHUNK_TREE_MAX_DEPTH)
 	maxWorldSize := maxChunkAmount * config.CHUNK_WIDTH
-	fmt.Println(maxWorldSize)
 	return &World{
 		maxWorldSize: int(maxWorldSize),
 		chunkTree:    CreateChunkTree(),
@@ -66,8 +64,6 @@ func (w *World) UpdateCamera(camTarget types.Vec2, dt float64) error {
 		float64(w.maxWorldSize-config.WINDOW_WIDTH),
 		float64(w.maxWorldSize-config.WINDOW_HEIGHT),
 	)
-
-	fmt.Println(w.cameraPos)
 
 	return nil
 }
