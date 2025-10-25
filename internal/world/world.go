@@ -63,7 +63,7 @@ func (w *World) UpdateCamera(camTarget types.Vec2, dt float64) error {
 		0,
 		float64(w.maxWorldSize-config.WINDOW_WIDTH),
 		float64(w.maxWorldSize-config.WINDOW_HEIGHT),
-	)
+	).Trunc()
 
 	return nil
 }

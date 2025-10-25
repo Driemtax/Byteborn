@@ -136,3 +136,8 @@ func (v Vec2) Normalize() Vec2 {
 	len := math.Sqrt(lenSq) // Calculate length only if non-zero
 	return Vec2{v.X / len, v.Y / len}
 }
+
+// Trunc truncates the values of the vector to their integer value
+func (v Vec2) Trunc() Vec2 {
+	return Vec2{X: math.Trunc(v.X), Y: math.Trunc(v.Y)}
+}
