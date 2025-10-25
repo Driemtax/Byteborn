@@ -3,6 +3,7 @@ package world
 import (
 	"fmt"
 	"image/color"
+	"math/rand"
 
 	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -20,14 +21,14 @@ const (
 )
 
 var TILE_DETAILS = [MAX_TILE_AMOUNT]TileDetail{
-	{name: "Grass", abbreviation: "GR", color: color.RGBA{R: 0, G: 230, B: 0, A: 255}},
 	{name: "None", abbreviation: "##", color: color.RGBA{R: 0, G: 0, B: 0, A: 255}},
+	{name: "Grass", abbreviation: "GR", color: color.RGBA{R: 0, G: 230, B: 0, A: 255}},
 	{name: "Path", abbreviation: "PA", color: color.RGBA{R: 150, G: 150, B: 10, A: 255}},
-	{name: "Wall", abbreviation: "WA", color: color.RGBA{R: 255, G: 255, B: 255, A: 255}},
+	{name: "Wall", abbreviation: "WA", color: color.RGBA{R: 255, G: 0, B: 0, A: 255}},
 }
 
 func NewTile() Tile {
-	return NONE
+	return Tile(rand.Intn(int(MAX_TILE_AMOUNT)))
 }
 
 func (t Tile) String() string {

@@ -1,8 +1,8 @@
 package config
 
 const (
-	WINDOW_WIDTH  = 400
-	WINDOW_HEIGHT = 400
+	WINDOW_WIDTH  = 800
+	WINDOW_HEIGHT = 800
 
 	// -----------------
 	// --- W O R L D ---

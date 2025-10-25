@@ -78,3 +78,7 @@ func (w *World) Draw(screen *ebiten.Image) {
 		node.Draw(screen, w.cameraPos)
 	}
 }
+
+func (w *World) GetCameraPos() types.Vec2 {
+	return w.cameraPos
+}

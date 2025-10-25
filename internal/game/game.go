@@ -3,27 +3,31 @@ package game
 import (
 	"log"
 
+	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/internal/player"
 	"github.com/Driemtax/Byteborn/internal/scene"
+	"github.com/Driemtax/Byteborn/internal/world"
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 func init() {
-	ebiten.SetWindowSize(800, 800)
+	ebiten.SetWindowSize(config.WINDOW_WIDTH, config.WINDOW_HEIGHT)
 	ebiten.SetWindowTitle("Byteborn by Archaide")
 	ebiten.SetTPS(60)
 }
 
 type Game struct {
 	player *player.Player
+	world  *world.World
 	keys   []ebiten.Key
 }
 
 func NewGame() *Game {
 	return &Game{
 		player: player.NewPlayer(),
+		world:  world.NewWorld(),
 	}
 }
 
@@ -63,17 +67,22 @@ func (g *Game) HandleInput(p *player.Player) error {
 }
 
 func (g *Game) Update() error {
+	dt := 1.0 / float64(ebiten.TPS())
+
 	g.keys = inpututil.AppendPressedKeys(g.keys[:0])
 	g.HandleInput(g.player)
+	g.world.UpdateCamera(g.player.GetPos(), dt)
+
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.player.Draw(screen)
+	g.world.Draw(screen)
+	g.player.Draw(screen, g.world.GetCameraPos())
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 800, 800
+	return config.WINDOW_WIDTH, config.WINDOW_HEIGHT
 }
 
 var _ scene.Scene = (*Game)(nil)
