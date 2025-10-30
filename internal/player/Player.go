@@ -23,33 +23,95 @@ func NewPlayer() *Player {
 	}
 }
 
-func (p *Player) Move(d types.Direction) error {
+func (p *Player) Update() {
+
+}
+
+// Moves the player based on a 2d direction vector
+// UP = 	(0,-1)
+// RIGHT = 	(1,0)
+// DOWN = 	(0,1)
+// LEFT = 	(-1,0)
+// UP_RIGHT = UP + RIGHT
+// ...
+func (p *Player) Move(dir types.Vector2D) error {
 	actualSpeed := p.Speed
 	if p.IsRunning {
 		actualSpeed *= 2
 	}
 
-	switch d {
-	case types.UNDEFINED:
-	case types.UP:
-		// if u ask yourself why i subtracted 10 here, you asked a very good question, but it works so get on with it :)
-		if p.Pos.Y >= (p.Size.Y/2)-10 {
-			p.Pos.Y -= actualSpeed
+	switch dir {
+	// UP
+	case types.NewVector2D(0, -1):
+		if p.checkUp(actualSpeed) {
+			p.Pos.Y += dir.Y * actualSpeed
 		}
-	case types.DOWN:
-		if p.Pos.Y <= 790-(p.Size.Y) {
-			p.Pos.Y += actualSpeed
+	// RIGHT
+	case types.NewVector2D(1, 0):
+		if p.checkRight() {
+			p.Pos.X += dir.X * actualSpeed
 		}
-	case types.LEFT:
-		if p.Pos.X >= (p.Size.X/2)-10 {
-			p.Pos.X -= actualSpeed
+	// DOWN
+	case types.NewVector2D(0, 1):
+		if p.checkDown() {
+			p.Pos.Y += dir.Y * actualSpeed
 		}
-	case types.RIGHT:
-		if p.Pos.X <= 790-(p.Size.X) {
-			p.Pos.X += actualSpeed
+	// LEFT
+	case types.NewVector2D(-1, 0):
+		if p.checkLeft(actualSpeed) {
+			p.Pos.X += dir.X * actualSpeed
+		}
+	// UP_RIGHT
+	case types.NewVector2D(1, -1):
+		dir = dir.Normalize()
+		if p.checkRight() && p.checkUp(actualSpeed) {
+			p.Pos.X += dir.X * actualSpeed
+			p.Pos.Y += dir.Y * actualSpeed
+		}
+	// UP_LEFT
+	case types.NewVector2D(-1, -1):
+		dir = dir.Normalize()
+		if p.checkUp(actualSpeed) && p.checkLeft(actualSpeed) {
+			p.Pos.X += dir.X * actualSpeed
+			p.Pos.Y += dir.Y * actualSpeed
+		}
+	// DOWN_RIGHT
+	case types.NewVector2D(1, 1):
+		dir = dir.Normalize()
+		if p.checkDown() && p.checkRight() {
+			p.Pos.X += dir.X * actualSpeed
+			p.Pos.Y += dir.Y * actualSpeed
+		}
+	// DOWN_LEFT
+	case types.NewVector2D(-1, 1):
+		dir = dir.Normalize()
+		if p.checkDown() && p.checkLeft(actualSpeed) {
+			p.Pos.X += dir.X * actualSpeed
+			p.Pos.Y += dir.Y * actualSpeed
 		}
 	}
+
 	return nil
+}
+
+// Checks if there is enough space on the map to move the player upwards based on his position
+func (p *Player) checkUp(speed float64) bool {
+	return p.Pos.Y >= (p.Size.Y/2)-speed
+}
+
+// Checks if there is enough space on the map to move the player right based on his position
+func (p *Player) checkRight() bool {
+	return p.Pos.X <= 790-(p.Size.X)
+}
+
+// Checks if there is enough space on the map to move the player down based on his position
+func (p *Player) checkDown() bool {
+	return p.Pos.Y <= 790-(p.Size.Y)
+}
+
+// Checks if there is enough space on the map to move the player left based on his position
+func (p *Player) checkLeft(speed float64) bool {
+	return p.Pos.X >= (p.Size.X/2)-speed
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
