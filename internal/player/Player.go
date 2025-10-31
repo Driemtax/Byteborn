@@ -4,6 +4,7 @@ import (
 	"image/color"
 
 	"github.com/Driemtax/Byteborn/pkg/types"
+	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
@@ -34,64 +35,86 @@ func (p *Player) Update() {
 // LEFT = 	(-1,0)
 // UP_RIGHT = UP + RIGHT
 // ...
-func (p *Player) Move(dir types.Vector2D) error {
+func (p *Player) Move(dir types.Vector2D, world *util.Map) error {
 	actualSpeed := p.Speed
 	if p.IsRunning {
 		actualSpeed *= 2
 	}
 
+	var newPos types.Vector2D
 	switch dir {
 	// UP
 	case types.NewVector2D(0, -1):
 		if p.checkUp(actualSpeed) {
-			p.Pos.Y += dir.Y * actualSpeed
+			newPos.X = p.Pos.X
+			newPos.Y = p.Pos.Y + dir.Y*actualSpeed
 		}
 	// RIGHT
 	case types.NewVector2D(1, 0):
 		if p.checkRight() {
-			p.Pos.X += dir.X * actualSpeed
+			newPos.X = p.Pos.X + dir.X*actualSpeed
+			newPos.Y = p.Pos.Y
 		}
 	// DOWN
 	case types.NewVector2D(0, 1):
 		if p.checkDown() {
-			p.Pos.Y += dir.Y * actualSpeed
+			newPos.X = p.Pos.X
+			newPos.Y = p.Pos.Y + dir.Y*actualSpeed
 		}
 	// LEFT
 	case types.NewVector2D(-1, 0):
 		if p.checkLeft(actualSpeed) {
-			p.Pos.X += dir.X * actualSpeed
+			newPos.X = p.Pos.X + dir.X*actualSpeed
+			newPos.Y = p.Pos.Y
 		}
 	// UP_RIGHT
 	case types.NewVector2D(1, -1):
 		dir = dir.Normalize()
 		if p.checkRight() && p.checkUp(actualSpeed) {
-			p.Pos.X += dir.X * actualSpeed
-			p.Pos.Y += dir.Y * actualSpeed
+			newPos.X = p.Pos.X + dir.X*actualSpeed
+			newPos.Y = p.Pos.Y + dir.Y*actualSpeed
 		}
 	// UP_LEFT
 	case types.NewVector2D(-1, -1):
 		dir = dir.Normalize()
 		if p.checkUp(actualSpeed) && p.checkLeft(actualSpeed) {
-			p.Pos.X += dir.X * actualSpeed
-			p.Pos.Y += dir.Y * actualSpeed
+			newPos.X = p.Pos.X + dir.X*actualSpeed
+			newPos.Y = p.Pos.Y + dir.Y*actualSpeed
 		}
 	// DOWN_RIGHT
 	case types.NewVector2D(1, 1):
 		dir = dir.Normalize()
 		if p.checkDown() && p.checkRight() {
-			p.Pos.X += dir.X * actualSpeed
-			p.Pos.Y += dir.Y * actualSpeed
+			newPos.X = p.Pos.X + dir.X*actualSpeed
+			newPos.Y = p.Pos.Y + dir.Y*actualSpeed
 		}
 	// DOWN_LEFT
 	case types.NewVector2D(-1, 1):
 		dir = dir.Normalize()
 		if p.checkDown() && p.checkLeft(actualSpeed) {
-			p.Pos.X += dir.X * actualSpeed
-			p.Pos.Y += dir.Y * actualSpeed
+			newPos.X = p.Pos.X + dir.X*actualSpeed
+			newPos.Y = p.Pos.Y + dir.Y*actualSpeed
 		}
 	}
 
+	if p.checkValidMove(newPos, world) {
+		p.Pos.X = newPos.X
+		p.Pos.Y = newPos.Y
+	}
+
 	return nil
+}
+
+// Checks if the tile the player moves is a valid position, e.g. the player can't walk on water
+// TODO: currently i move 10 pixel, but i only check the new position, not what is in between
+func (p *Player) checkValidMove(newPos types.Vector2D, world *util.Map) bool {
+	result := false
+
+	if world.Tiles[int(newPos.Y)][int(newPos.X)] == 1 || world.Tiles[int(newPos.Y)][int(newPos.X)] == 2 {
+		result = true
+	}
+
+	return result
 }
 
 // Checks if there is enough space on the map to move the player upwards based on his position

@@ -1,12 +1,11 @@
 package game
 
 import (
-	"log"
-
 	"github.com/Driemtax/Byteborn/internal/input"
 	"github.com/Driemtax/Byteborn/internal/player"
 	"github.com/Driemtax/Byteborn/internal/scene"
 	"github.com/Driemtax/Byteborn/pkg/types"
+	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -19,17 +18,17 @@ func init() {
 type Game struct {
 	player *player.Player
 	input  *input.InputState
+	world  *util.Map
 }
 
 func NewGame() *Game {
 	return &Game{
 		player: player.NewPlayer(),
+		world:  util.NewMap(),
 	}
 }
 
-func (g *Game) HandleInput() error {
-	var err error
-
+func (g *Game) HandleInput() types.Vector2D {
 	if g.input.LShift {
 		g.player.IsRunning = true
 	}
@@ -48,17 +47,13 @@ func (g *Game) HandleInput() error {
 		direction = direction.Add(types.NewVector2D(-1, 0))
 	}
 
-	err = g.player.Move(direction)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return err
+	return direction
 }
 
 func (g *Game) Update() error {
 	g.input = input.GetInputState()
-	g.HandleInput()
+	direction := g.HandleInput()
+	g.player.Move(direction, g.world)
 
 	// reset running since a player should only be running as long as shift is pressed
 	g.player.IsRunning = false
@@ -66,6 +61,7 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	g.world.Draw(screen)
 	g.player.Draw(screen)
 }
 
