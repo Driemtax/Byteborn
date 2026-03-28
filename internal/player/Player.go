@@ -23,32 +23,30 @@ func NewPlayer() *Player {
 	}
 }
 
-func (p *Player) Move(d types.Direction) error {
+func (p *Player) Move(dir types.Vector2D) error {
 	actualSpeed := p.Speed
 	if p.IsRunning {
 		actualSpeed *= 2
 	}
 
-	switch d {
-	case types.UNDEFINED:
-	case types.UP:
-		// if u ask yourself why i subtracted 10 here, you asked a very good question, but it works so get on with it :)
-		if p.Pos.Y >= (p.Size.Y/2)-10 {
-			p.Pos.Y -= actualSpeed
-		}
-	case types.DOWN:
-		if p.Pos.Y <= 790-(p.Size.Y) {
-			p.Pos.Y += actualSpeed
-		}
-	case types.LEFT:
-		if p.Pos.X >= (p.Size.X/2)-10 {
-			p.Pos.X -= actualSpeed
-		}
-	case types.RIGHT:
-		if p.Pos.X <= 790-(p.Size.X) {
-			p.Pos.X += actualSpeed
-		}
-	}
+	// Normalize the direction. That garantuees, that diagonal movement is NOT faster as horizontal or vertical movement.
+	// See docs for further details.
+	dir = dir.Normalize()
+
+	// calculate velocity of movement
+	v := dir.Mul(actualSpeed)
+
+	newPos := types.NewVector2D(0, 0)
+
+	// Apply the move. This function holds for all directions. See documentation for further eplanations on this formula
+	newPos.X = max(0, min(p.Pos.X+v.X, 800-p.Size.X)) // TODO: Add variable for Window width
+	newPos.Y = max(0, min(p.Pos.Y+v.Y, 800-p.Size.Y)) // TODO: Add variable for Window height
+
+	// TODO: Check if newPos is legit with map api (cant walk on water etc.)
+	// For now we assume it is.
+	p.Pos.X = newPos.X
+	p.Pos.Y = newPos.Y
+
 	return nil
 }
 

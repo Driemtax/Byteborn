@@ -5,9 +5,9 @@ import (
 
 	"github.com/Driemtax/Byteborn/internal/player"
 	"github.com/Driemtax/Byteborn/internal/scene"
+	"github.com/Driemtax/Byteborn/pkg/input"
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 func init() {
@@ -18,7 +18,7 @@ func init() {
 
 type Game struct {
 	player *player.Player
-	keys   []ebiten.Key
+	input  *input.InputState
 }
 
 func NewGame() *Game {
@@ -27,44 +27,47 @@ func NewGame() *Game {
 	}
 }
 
-func (g *Game) HandleInput(p *player.Player) error {
+func (g *Game) HandleInput() (types.Vec2, error) {
 	var err error
-	// Idea: Instead of iterating i could identify all unique keys in the array and if there is more then one the direction
-	// is diagonal. Then i can normalize the movement speed in move()
-	for _, k := range g.keys {
-		// doesnt work. i could use vectors here too and just multiply the direction by 2 or something
-		if k == ebiten.KeyShift {
-			g.player.IsRunning = true
-		}
-		var direction types.Direction
-		switch k {
-		case ebiten.KeyW:
-			direction = types.UP
-		case ebiten.KeyA:
-			direction = types.LEFT
-		case ebiten.KeyS:
-			direction = types.DOWN
-		case ebiten.KeyD:
-			direction = types.RIGHT
-		default:
-			direction = types.UNDEFINED
-		}
 
-		err = p.Move(direction)
-		if err != nil {
-			log.Fatal(err)
-		}
+	if g.input.LSHIFT {
+		g.player.IsRunning = true
 	}
 
-	// reset running
-	g.player.IsRunning = false
+	direction := types.NewVector2D(0, 0)
 
-	return err
+	// Directions: explanation
+	if g.input.UP {
+		direction = direction.Add(types.NewVector2D(0, -1))
+	}
+
+	if g.input.DOWN {
+		direction = direction.Add(types.NewVector2D(0, 1))
+	}
+
+	if g.input.RIGHT {
+		direction = direction.Add(types.NewVector2D(1, 0))
+	}
+
+	if g.input.LEFT {
+		direction = direction.Add(types.NewVector2D(-1, 0))
+	}
+
+	return direction, err
 }
 
 func (g *Game) Update() error {
-	g.keys = inpututil.AppendPressedKeys(g.keys[:0])
-	g.HandleInput(g.player)
+	g.input = input.GetInputState()
+	dir, err := g.HandleInput()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	g.player.Move(dir)
+
+	// Reset running every frame
+	g.player.IsRunning = false
+
 	return nil
 }
 
