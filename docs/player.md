@@ -19,11 +19,17 @@ $$x += 0,\quad y = max(0,y-actualSpeed)$$
 
 The other directions can be written as follows:
 
-DOWN $$x += 0, \quad y = min(y+actualSpeed, HEIGHT)$$
+DOWN 
 
-LEFT $$x = max(0,x-actualSpeed), \quad y+=0$$
+$$x += 0, \quad y = min(y+actualSpeed, HEIGHT)$$
 
-RIGHT $$x = min(x+actualSpeed, WIDTH),\quad y+=0$$
+LEFT 
+
+$$x = max(0,x-actualSpeed), \quad y+=0$$
+
+RIGHT 
+
+$$x = min(x+actualSpeed, WIDTH),\quad y+=0$$
 
 We further define a vector $\vec{v}$ for the velocity. This is calculated as the product of the direction vector and the actualSpeed. This results in a new vector, which holds information of the diretion and the speed the player is moving. The formulas for moving can now be combined to:
 
