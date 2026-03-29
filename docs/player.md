@@ -14,11 +14,11 @@ $$1² + 1² = 2$$ The Square Root of this is the actual distance, we moved, whic
 Next, I derived a formula that applies to every direction of motion. The basic idea was to not have a long `if-else` chain. Firstly i had a look at all possible moving directions i needed. Thus beeing UP, DOWN, LEFT, RIGHT. The diagonal movement could later be a sum of two lateral moves.
 
 For moving UP the x-Value of the player position would not need to change. The y-Value of the player position would decrease of the value of the actual moving speed, since the upper, left corner of the window has the coordinates $0,0$. As we dont want to go higher then the window boundaries, the value cannot go lower then $0$. To ensure this, i used the `max` function. The UP-Movement can therefore be written as:
-$$x +=  & y = max(0,y-actualSpeed)$$
+$$x += 0,\quad y = max(0,y-actualSpeed)$$
 The other directions can be written as follows:
-DOWN $$x += 0 & y = min(y+actualSpeed, HEIGHT)$$
-LEFT $$x = max(0,x-actualSpeed) & y+=0$$
-RIGHT $$x = min(x+actualSpeed, WIDTH) & y+=0$$
+DOWN $$x += 0, \quad y = min(y+actualSpeed, HEIGHT)$$
+LEFT $$x = max(0,x-actualSpeed), \quad y+=0$$
+RIGHT $$x = min(x+actualSpeed, WIDTH),\quad y+=0$$
 
 We further define a vector $\vec{v}$ for the velocity. This is calculated as the product of the direction vector and the actualSpeed. This results in a new vector, which holds information of the diretion and the speed the player is moving. The formulas for moving can now be combined to:
 $$x = max(0,min(x+v_1, W))$$ where $v_1$ is the first component of the vector $\vec{v}$ and $W = \text{WIDTH} - \text{playerWidth}$. This is analogous for the y-Value:
