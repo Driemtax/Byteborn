@@ -42,3 +42,15 @@ $$y = max(0,min(y+v_2, H))$$
 where $v_2$ is the second component of the vector $\vec{v}$ and $H = \text{HEIGHT} - \text{playerHeight}$. Therefore the vector $\vec{p}$ for the new Position of the player can be calculated quit effective.
 ### Checking for illegal moves
 The last step is to check if the new position the player wants to move to is a legit position. The player cannot move through walls or walk on water. This can be done via the API of the map. Since this is currently not implemented, it will be added later on.
+## Draw
+The `draw()` functions draws the player sprite to the screen.
+
+As we have a spritesheet containing all player sprites we need a way to only print the sub image to the screen containing the current player sprite. This depens on the look direction of the player aswell as of an animation counter. When the player is moving there are 3 sprites continiouslly being drawn to the screen, so it looks like the player is walking. 
+
+Firstly we need to create to points $p_1$ and $p_2$, which define the rectangle containing the current player sprite. $p_1$ defines the upper left corner of the rectangle, whereas $p_2$ defines the lower right corner. $p_1$ can be defined as:
+
+$$x_0 = \text{frameCount} * \text{playerSizeX}, \quad y_0 = \text{lookDirection} * \text{playerSizeY}$$
+
+This holds because, the lookDirection defines the row of the spriteSheet we need, where as one row is exactly the size of the player itself, in this case 32 pixel. The frameCount tells us which column we currently need. One row of the spridesheet contains 3 columns with the 3 sprites we need for the walking animation. This is indexed by the frameCount times the playerSize, in this case 32 pixel aswell.
+
+We then cut exactly this sub image from the original spritesheet. Important is to translate the new sub image to the player position on the screen. Otherwise we would always print the player to the top left corner of the window, despite its actual position.
