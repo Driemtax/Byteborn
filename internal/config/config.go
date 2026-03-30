@@ -1,8 +1,9 @@
 package config
 
 const (
-	WINDOW_WIDTH  = 400
-	WINDOW_HEIGHT = 400
+	WINDOW_WIDTH  = 480
+	WINDOW_HEIGHT = 270
+	WINDOW_SCALE  = 3
 
 	// -----------------
 	// --- W O R L D ---
@@ -20,4 +21,9 @@ const (
 	CHUNK_TREE_MAX_DEPTH = 8
 	// Camera
 	CAMERA_SPEED = 6.0
+
+	// -------------------
+	// --- P L A Y E R ---
+	// -------------------
+	PLAYER_SPEED = 3.0
 )

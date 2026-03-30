@@ -3,6 +3,7 @@ package player
 import (
 	"image"
 
+	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -30,11 +31,17 @@ const (
 	UP
 )
 
+const (
+	HEIGHT = config.WINDOW_HEIGHT
+	WIDHT  = config.WINDOW_WIDTH
+	SPEED  = config.PLAYER_SPEED
+)
+
 func NewPlayer() *Player {
 	return &Player{
 		Size:          types.NewVector2D(32, 32),
-		Pos:           types.NewVector2D(380, 380),
-		Speed:         10.0,
+		Pos:           types.NewVector2D(WIDHT/2, HEIGHT/2),
+		Speed:         SPEED,
 		IsRunning:     false,
 		spriteSheet:   util.LoadAsset("assets/Poke3.png"),
 		lookDirection: int(DOWN),
@@ -59,8 +66,8 @@ func (p *Player) Move(dir types.Vector2D) error {
 	newPos := types.NewVector2D(0, 0)
 
 	// Apply the move. This function holds for all directions. See documentation for further eplanations on this formula
-	newPos.X = max(0, min(p.Pos.X+v.X, 800-p.Size.X)) // TODO: Add variable for Window width
-	newPos.Y = max(0, min(p.Pos.Y+v.Y, 800-p.Size.Y)) // TODO: Add variable for Window height
+	newPos.X = max(0, min(p.Pos.X+v.X, WIDHT-p.Size.X))  // TODO: Add variable for Window width
+	newPos.Y = max(0, min(p.Pos.Y+v.Y, HEIGHT-p.Size.Y)) // TODO: Add variable for Window height
 
 	// TODO: Check if newPos is legit with map api (cant walk on water etc.)
 	// For now we assume it is.

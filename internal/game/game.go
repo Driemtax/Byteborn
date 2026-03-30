@@ -3,6 +3,7 @@ package game
 import (
 	"log"
 
+	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/internal/player"
 	"github.com/Driemtax/Byteborn/internal/scene"
 	"github.com/Driemtax/Byteborn/pkg/input"
@@ -10,8 +11,16 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+const (
+	WIDHT         = config.WINDOW_WIDTH
+	HEIGHT        = config.WINDOW_HEIGHT
+	SCALE         = config.WINDOW_SCALE
+	SCALED_WIDTH  = WIDHT * SCALE
+	SCALED_HEIGHT = HEIGHT * SCALE
+)
+
 func init() {
-	ebiten.SetWindowSize(800, 800)
+	ebiten.SetWindowSize(SCALED_WIDTH, SCALED_HEIGHT)
 	ebiten.SetWindowTitle("Byteborn by Archaide")
 	ebiten.SetTPS(60)
 }
@@ -76,7 +85,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 800, 800
+	return WIDHT, HEIGHT
 }
 
 var _ scene.Scene = (*Game)(nil)
