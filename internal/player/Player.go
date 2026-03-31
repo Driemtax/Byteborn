@@ -2,7 +2,6 @@ package player
 
 import (
 	"image"
-	"time"
 
 	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/pkg/types"
@@ -20,8 +19,7 @@ type Player struct {
 	spriteSheet    *ebiten.Image
 	lookDirection  int
 	animationCount int
-	DeltaSum       time.Duration
-	isMoving       bool
+	IsMoving       bool
 }
 
 type LookDirection int
@@ -38,7 +36,7 @@ const (
 	WIDHT  = config.WINDOW_WIDTH
 	SPEED  = config.PLAYER_SPEED
 
-	ANIMATION_UPDATE_INTERVALL = config.ANIMATION_UPDATE_INTERVALL
+	TICK_UPDATE = config.TICK_UPDATE
 )
 
 func NewPlayer() *Player {
@@ -50,18 +48,18 @@ func NewPlayer() *Player {
 		spriteSheet:    util.LoadAsset("assets/Poke3.png"),
 		lookDirection:  int(DOWN),
 		animationCount: 0,
-		DeltaSum:       time.Duration(0),
-		isMoving:       false,
+		IsMoving:       false,
 	}
 }
 
-// Updates the animationCount based on the deltaSum and the config on how fast the animation should be played
-func (p *Player) updateAC() {
-	// if the last time since the animation was updated is longer then 500ms, then we update the animation once more
-	// and reset the sum of delta times to gather 500ms again.
-	if p.DeltaSum.Milliseconds() >= ANIMATION_UPDATE_INTERVALL {
-		p.animationCount = (p.animationCount + 1) % 3
-		p.DeltaSum = 0.0
+// Updates the animationCount based on the tick count and the config on how fast the animation should be played
+func (p *Player) UpdateAC() {
+	if p.IsMoving {
+		if ebiten.Tick()%int64(TICK_UPDATE) == 0 {
+			p.animationCount = 1 + (p.animationCount & 1) // = p.animationCount % 2
+		}
+	} else {
+		p.animationCount = 0 // standing position sprite
 	}
 }
 

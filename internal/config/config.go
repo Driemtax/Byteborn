@@ -5,6 +5,8 @@ const (
 	WINDOW_HEIGHT = 270
 	WINDOW_SCALE  = 3
 
+	TPS = 60
+
 	// -----------------
 	// --- W O R L D ---
 	// -----------------
@@ -25,6 +27,7 @@ const (
 	// -------------------
 	// --- P L A Y E R ---
 	// -------------------
-	PLAYER_SPEED               = 3.0
+	PLAYER_SPEED               = 2.0
 	ANIMATION_UPDATE_INTERVALL = 500 // How often the animation updates in ms
+	TICK_UPDATE                = TPS * (float64(ANIMATION_UPDATE_INTERVALL) / 1000.0)
 )

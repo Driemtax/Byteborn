@@ -2,7 +2,6 @@ package game
 
 import (
 	"log"
-	"time"
 
 	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/internal/player"
@@ -18,31 +17,30 @@ const (
 	SCALE         = config.WINDOW_SCALE
 	SCALED_WIDTH  = WIDHT * SCALE
 	SCALED_HEIGHT = HEIGHT * SCALE
+
+	TPS = config.TPS
 )
 
 func init() {
 	ebiten.SetWindowSize(SCALED_WIDTH, SCALED_HEIGHT)
 	ebiten.SetWindowTitle("Byteborn by Archaide")
-	ebiten.SetTPS(60)
+	ebiten.SetTPS(TPS)
 }
 
 type Game struct {
 	player *player.Player
 	input  *input.InputState
-
-	// Delta Time Handling
-	dt         float64
-	dtDuration time.Duration
 }
 
 func NewGame() *Game {
 	return &Game{
 		player: player.NewPlayer(),
-		dt:     0.0,
 	}
 }
 
 func (g *Game) HandleInput() (types.Vec2, error) {
+	// reset walking status of player
+	g.player.IsMoving = false
 	var err error
 
 	if g.input.LSHIFT {
@@ -68,20 +66,18 @@ func (g *Game) HandleInput() (types.Vec2, error) {
 		direction = direction.Add(types.NewVector2D(-1, 0))
 	}
 
+	// Set the player IsMoving for walking animation
+	if direction.LengthSq() > 0 {
+		g.player.IsMoving = true
+	}
+
 	return direction, err
 }
 
-// Updates the delta time every tick.
-func (g *Game) updateDT() {
-	g.dt = 1.0 / ebiten.ActualTPS()
-	g.dtDuration = time.Second / time.Duration(ebiten.ActualTPS())
-
-	// Updates the player sum of delta times
-	g.player.DeltaSum += g.dtDuration
-}
-
 func (g *Game) Update() error {
-	g.updateDT()
+	// Update player animation count
+	g.player.UpdateAC()
+
 	g.input = input.GetInputState()
 	dir, err := g.HandleInput()
 
