@@ -2,6 +2,7 @@ package player
 
 import (
 	"image"
+	"time"
 
 	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/pkg/types"
@@ -16,10 +17,11 @@ type Player struct {
 	IsRunning bool
 
 	// asset management
-	spriteSheet   *ebiten.Image
-	lookDirection int
-	frameCount    int
-	isMoving      bool
+	spriteSheet    *ebiten.Image
+	lookDirection  int
+	animationCount int
+	DeltaSum       time.Duration
+	isMoving       bool
 }
 
 type LookDirection int
@@ -35,18 +37,31 @@ const (
 	HEIGHT = config.WINDOW_HEIGHT
 	WIDHT  = config.WINDOW_WIDTH
 	SPEED  = config.PLAYER_SPEED
+
+	ANIMATION_UPDATE_INTERVALL = config.ANIMATION_UPDATE_INTERVALL
 )
 
 func NewPlayer() *Player {
 	return &Player{
-		Size:          types.NewVector2D(32, 32),
-		Pos:           types.NewVector2D(WIDHT/2, HEIGHT/2),
-		Speed:         SPEED,
-		IsRunning:     false,
-		spriteSheet:   util.LoadAsset("assets/Poke3.png"),
-		lookDirection: int(DOWN),
-		frameCount:    0,
-		isMoving:      false,
+		Size:           types.NewVector2D(32, 32),
+		Pos:            types.NewVector2D(WIDHT/2, HEIGHT/2),
+		Speed:          SPEED,
+		IsRunning:      false,
+		spriteSheet:    util.LoadAsset("assets/Poke3.png"),
+		lookDirection:  int(DOWN),
+		animationCount: 0,
+		DeltaSum:       time.Duration(0),
+		isMoving:       false,
+	}
+}
+
+// Updates the animationCount based on the deltaSum and the config on how fast the animation should be played
+func (p *Player) updateAC() {
+	// if the last time since the animation was updated is longer then 500ms, then we update the animation once more
+	// and reset the sum of delta times to gather 500ms again.
+	if p.DeltaSum.Milliseconds() >= ANIMATION_UPDATE_INTERVALL {
+		p.animationCount = (p.animationCount + 1) % 3
+		p.DeltaSum = 0.0
 	}
 }
 
@@ -79,7 +94,7 @@ func (p *Player) Move(dir types.Vector2D) error {
 
 func (p *Player) Draw(screen *ebiten.Image) {
 	// Get the coordinates of the correct sprite from spriteSheet
-	xStart := p.frameCount * int(p.Size.X)
+	xStart := p.animationCount * int(p.Size.X)
 	yStart := p.lookDirection * int(p.Size.Y)
 	xEnd := xStart + int(p.Size.X)
 	yEnd := yStart + int(p.Size.Y)

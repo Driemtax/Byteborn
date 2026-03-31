@@ -25,5 +25,6 @@ const (
 	// -------------------
 	// --- P L A Y E R ---
 	// -------------------
-	PLAYER_SPEED = 3.0
+	PLAYER_SPEED               = 3.0
+	ANIMATION_UPDATE_INTERVALL = 500 // How often the animation updates in ms
 )
