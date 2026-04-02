@@ -1,5 +1,6 @@
 # Player
 ## Basic Idea
+The player structs holds the following attributes.
 ## Move
 The Function `Move()` handels one move of the player. It takes the following as an argument:
 - dir: The Direction Vector, the player wants to move
@@ -43,7 +44,7 @@ where $v_2$ is the second component of the vector $\vec{v}$ and $H = \text{HEIGH
 ### Checking for illegal moves
 The last step is to check if the new position the player wants to move to is a legit position. The player cannot move through walls or walk on water. This can be done via the API of the map. Since this is currently not implemented, it will be added later on.
 ## Draw
-The `draw()` functions draws the player sprite to the screen.
+The `draw()` function draws the player sprite to the screen.
 
 As we have a spritesheet containing all player sprites we need a way to only print the sub image to the screen containing the current player sprite. This depens on the look direction of the player aswell as of an animation counter. When the player is moving there are 3 sprites continiouslly being drawn to the screen, so it looks like the player is walking. 
 
@@ -54,3 +55,17 @@ $$x_0 = \text{frameCount} * \text{playerSizeX}, \quad y_0 = \text{lookDirection}
 This holds because, the lookDirection defines the row of the spriteSheet we need, where as one row is exactly the size of the player itself, in this case 32 pixel. The frameCount tells us which column we currently need. One row of the spridesheet contains 3 columns with the 3 sprites we need for the walking animation. This is indexed by the frameCount times the playerSize, in this case 32 pixel aswell.
 
 We then cut exactly this sub image from the original spritesheet. Important is to translate the new sub image to the player position on the screen. Otherwise we would always print the player to the top left corner of the window, despite its actual position.
+## UpdateAC
+The `UpdateAC` function updates the `animationCount` variable on every game tick. The config file defines how fast the animation of the player walking should be played. 
+
+We use the build-in delta time feature of ebiten here by calling the `ebiten.Tick()` function. This returns the count of ticks that have ellapsed since the game has started. Ebiten ensures, that the configured Ticks per second hold on every hardware. If your computer is too slow, you will have a lower tick rate. But if your pc is faster, you will **not** have a higher tick rate, which is quit important, so your walking animation is not played to fast. We use the modulo operation to check if enough ticks have ellapsed to update our animation. The `animationCount` varibale defines the index of the column of the spritesheet we draw on the screen. The bitwise AND operation is used here, because it is much faster then the modulo operator. The following code 
+
+```go
+p.animationCount = 1 + (p.animationCount & 1)
+```
+
+can be interpreted as a $% 2$ operation. This ensures, that the index for the spritesheet always toggles between $1$ and $2$, since those are the columns of the walking animation of the player in the spritesheet. If the player is not walking, then we simply set `animationCount` $=0$. This column holds the sprite for a standing player.
+## UpdateLookDirection()
+The `UpdateLookDirection` function updates the look direction of the player based on its prior move. If the player does not move, the `lastLookDirection` variable is not updated. On a player move it will be updated. For updating the look direction we simply use switch statement. The `lookDirection` holds the index of the row of the spritesheet we need to address to draw the correct sprite to the screen.
+
+This does not support diagonal movement yet, since we still discuss if we want to have diagonal movement in our game.
