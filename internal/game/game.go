@@ -49,7 +49,7 @@ func (g *Game) HandleInput() (types.Vec2, error) {
 
 	direction := types.NewVector2D(0, 0)
 
-	// Directions: explanation
+	// Directions: TODO: explanation
 	if g.input.UP {
 		direction = direction.Add(types.NewVector2D(0, -1))
 	}
@@ -69,6 +69,7 @@ func (g *Game) HandleInput() (types.Vec2, error) {
 	// Set the player IsMoving for walking animation
 	if direction.LengthSq() > 0 {
 		g.player.IsMoving = true
+		g.player.LastDirection = direction
 	}
 
 	return direction, err
@@ -77,6 +78,7 @@ func (g *Game) HandleInput() (types.Vec2, error) {
 func (g *Game) Update() error {
 	// Update player animation count
 	g.player.UpdateAC()
+	g.player.UpdateLookDirection()
 
 	g.input = input.GetInputState()
 	dir, err := g.HandleInput()

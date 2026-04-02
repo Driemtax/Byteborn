@@ -20,6 +20,7 @@ type Player struct {
 	lookDirection  int
 	animationCount int
 	IsMoving       bool
+	LastDirection  types.Vector2D
 }
 
 type LookDirection int
@@ -63,10 +64,24 @@ func (p *Player) UpdateAC() {
 	}
 }
 
+// Updates the lookDirection of the player based on the last move it made.
+func (p *Player) UpdateLookDirection() {
+	switch p.LastDirection {
+	case types.NewVector2D(0, -1):
+		p.lookDirection = int(UP)
+	case types.NewVector2D(0, 1):
+		p.lookDirection = int(DOWN)
+	case types.NewVector2D(-1, 0):
+		p.lookDirection = int(LEFT)
+	case types.NewVector2D(1, 0):
+		p.lookDirection = int(RIGHT)
+	}
+}
+
 func (p *Player) Move(dir types.Vector2D) error {
 	actualSpeed := p.Speed
 	if p.IsRunning {
-		actualSpeed *= 2
+		actualSpeed *= 1.5
 	}
 
 	// Normalize the direction. That garantuees, that diagonal movement is NOT faster as horizontal or vertical movement.
