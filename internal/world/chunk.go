@@ -32,7 +32,7 @@ func NewChunk() *Chunk {
 func (c *Chunk) GetTile(x, y int) Tile {
 	// Check if it is out of bounds
 	if y*config.CHUNK_SIZE+x < config.CHUNK_SIZE*config.CHUNK_SIZE {
-		return c[y+config.CHUNK_SIZE+x]
+		return c[y*config.CHUNK_SIZE+x]
 	}
 	// Its out of bounds so we return none because theres nothing...
 	return NONE
