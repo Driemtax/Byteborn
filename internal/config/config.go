@@ -1,8 +1,11 @@
 package config
 
 const (
-	WINDOW_WIDTH  = 400
-	WINDOW_HEIGHT = 400
+	WINDOW_WIDTH  = 480
+	WINDOW_HEIGHT = 270
+	WINDOW_SCALE  = 3
+
+	TPS = 60
 
 	// -----------------
 	// --- W O R L D ---
@@ -20,4 +23,11 @@ const (
 	CHUNK_TREE_MAX_DEPTH = 8
 	// Camera
 	CAMERA_SPEED = 6.0
+
+	// -------------------
+	// --- P L A Y E R ---
+	// -------------------
+	PLAYER_SPEED               = 2.0
+	ANIMATION_UPDATE_INTERVALL = 300 // How often the animation updates in ms
+	TICK_UPDATE                = TPS * (float64(ANIMATION_UPDATE_INTERVALL) / 1000.0)
 )
