@@ -65,16 +65,17 @@ func (p *Player) UpdateAC() {
 }
 
 // Updates the lookDirection of the player based on the last move it made.
+// Diagonal movement results in a look direction of left or right
 func (p *Player) UpdateLookDirection() {
-	switch p.LastDirection {
-	case types.NewVector2D(0, -1):
-		p.lookDirection = int(UP)
-	case types.NewVector2D(0, 1):
-		p.lookDirection = int(DOWN)
-	case types.NewVector2D(-1, 0):
+	switch {
+	case p.LastDirection.X == -1:
 		p.lookDirection = int(LEFT)
-	case types.NewVector2D(1, 0):
+	case p.LastDirection.X == 1:
 		p.lookDirection = int(RIGHT)
+	case p.LastDirection.Y == -1:
+		p.lookDirection = int(UP)
+	case p.LastDirection.Y == 1:
+		p.lookDirection = int(DOWN)
 	}
 }
 

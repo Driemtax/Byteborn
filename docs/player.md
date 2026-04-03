@@ -68,4 +68,41 @@ can be interpreted as a $% 2$ operation. This ensures, that the index for the sp
 ## UpdateLookDirection()
 The `UpdateLookDirection` function updates the look direction of the player based on its prior move. If the player does not move, the `lastLookDirection` variable is not updated. On a player move it will be updated. For updating the look direction we simply use switch statement. The `lookDirection` holds the index of the row of the spritesheet we need to address to draw the correct sprite to the screen.
 
-This does not support diagonal movement yet, since we still discuss if we want to have diagonal movement in our game.
+Firstly the approach for diagonal movement was to simply add 4 cases to the switch statement for every diagonal move. Moves that move the player to the upper left or lower left corner should result in a left look direction. This is analogous for the right direction. A switch statement is very performant, because the compiler can use a hashed jump table. The problem was, that i had to create 8 new 2D vectors, that use memory. This looked something like this:
+
+```go
+	switch p.LastDirection {
+		case types.NewVector2D(0, -1):
+			p.lookDirection = int(UP)
+		case types.NewVector2D(0, 1):
+			p.lookDirection = int(DOWN)
+		case types.NewVector2D(-1, 0):
+			p.lookDirection = int(LEFT)
+		case types.NewVector2D(-1,1):
+			p.lookDirection = int(LEFT)
+		case types.NewVector2D(-1,1):
+			p.lookDirection = int(LEFT)
+		case types.NewVector2D(1, 0):
+			p.lookDirection = int(RIGHT)
+		case types.NewVector2D(1,1):
+			p.lookDirection = int(RIGHT)
+		case types.NewVector2D(1,-1):
+			p.lookDirection = int(RIGHT)
+	}
+```
+
+So i decided to use a tagless switch statement, so that i dont need to create any new struct instances. The compiler cannot longer use the efficient way of a jump table, under the hood this is just a if-else chain. But it is not that long, having 4 cases. As you can see, this is also more readable then the old version:
+
+```go
+	switch {
+		case p.LastDirection.X == -1:
+			p.lookDirection = int(LEFT)
+		case p.LastDirection.X == 1:
+			p.lookDirection = int(RIGHT)
+		case p.LastDirection.Y == -1:
+			p.lookDirection = int(UP)
+		case p.LastDirection.Y == 1:
+			p.lookDirection = int(DOWN)
+	}
+
+```
