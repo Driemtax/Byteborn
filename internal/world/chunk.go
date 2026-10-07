@@ -1,6 +1,8 @@
 package world
 
 import (
+	"fmt"
+
 	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -15,10 +17,16 @@ type Chunk [config.CHUNK_SIZE * config.CHUNK_SIZE]Tile
 
 // Returns a new chunk
 // Each tile will reset to the basic tile type which is NONE
-func NewChunk() *Chunk {
+func NewChunk(pNode *ChunkNode) *Chunk {
 	newChunk := Chunk{}
-	for n := range config.CHUNK_SIZE * config.CHUNK_SIZE {
-		newChunk[n] = NewTile()
+	for x := range config.CHUNK_SIZE {
+		for y := range config.CHUNK_SIZE {
+			xnoise := float32(float32(pNode.topLeft.X) + float32(x)*config.TILE_SIZE)
+			ynoise := float32(float32(pNode.topLeft.Y) + float32(y)*config.TILE_SIZE)
+			noiseValue := noiseGenerator.Eval(xnoise, ynoise)
+			fmt.Println(noiseValue)
+			newChunk[x+y*config.CHUNK_SIZE] = NewTile(noiseValue)
+		}
 	}
 	return &newChunk
 }
@@ -32,7 +40,7 @@ func NewChunk() *Chunk {
 func (c *Chunk) GetTile(x, y int) Tile {
 	// Check if it is out of bounds
 	if y*config.CHUNK_SIZE+x < config.CHUNK_SIZE*config.CHUNK_SIZE {
-		return c[y+config.CHUNK_SIZE*x]
+		return c[x+config.CHUNK_SIZE*y]
 	}
 	// Its out of bounds so we return none because theres nothing...
 	return NONE

@@ -7,7 +7,10 @@ import (
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/kelindar/noise"
 )
+
+var noiseGenerator *noise.Simplex
 
 type World struct {
 	maxWorldSize int
@@ -20,6 +23,8 @@ type World struct {
 func NewWorld() *World {
 	maxChunkAmount := math.Pow(2, config.CHUNK_TREE_MAX_DEPTH)
 	maxWorldSize := maxChunkAmount * config.CHUNK_WIDTH
+	noiseSeed := 12
+	noiseGenerator = noise.NewSimplex(uint32(noiseSeed))
 	return &World{
 		maxWorldSize: int(maxWorldSize),
 		chunkTree:    CreateChunkTree(),

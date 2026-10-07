@@ -9,7 +9,7 @@ import (
 
 func CreateChunkNode(pNode *ChunkNode, depth int) *ChunkNode {
 	if depth == config.CHUNK_TREE_MAX_DEPTH {
-		pNode.chunk = NewChunk()
+		pNode.chunk = NewChunk(pNode)
 		return pNode
 	}
 
