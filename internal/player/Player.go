@@ -95,8 +95,8 @@ func (p *Player) Move(dir types.Vector2D) error {
 	newPos := types.NewVector2D(0, 0)
 
 	// Apply the move. This function holds for all directions. See documentation for further eplanations on this formula
-	newPos.X = max(0, min(p.Pos.X+v.X, WIDHT-p.Size.X))  // TODO: Add variable for Window width
-	newPos.Y = max(0, min(p.Pos.Y+v.Y, HEIGHT-p.Size.Y)) // TODO: Add variable for Window height
+	newPos.X = p.Pos.X + v.X
+	newPos.Y = p.Pos.Y + v.Y
 
 	// TODO: Check if newPos is legit with map api (cant walk on water etc.)
 	// For now we assume it is.
@@ -106,7 +106,7 @@ func (p *Player) Move(dir types.Vector2D) error {
 	return nil
 }
 
-func (p *Player) Draw(screen *ebiten.Image) {
+func (p *Player) Draw(screen *ebiten.Image, cameraPos types.Vec2) {
 	// Get the coordinates of the correct sprite from spriteSheet
 	xStart := p.animationCount * int(p.Size.X)
 	yStart := p.lookDirection * int(p.Size.Y)
@@ -119,6 +119,6 @@ func (p *Player) Draw(screen *ebiten.Image) {
 
 	// lastly just draw the image to the screen at the right position
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(p.Pos.X, p.Pos.Y)
+	op.GeoM.Translate(p.Pos.X-cameraPos.X, p.Pos.Y-cameraPos.Y)
 	screen.DrawImage(pixels, op)
 }

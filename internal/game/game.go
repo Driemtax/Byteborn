@@ -31,6 +31,7 @@ func init() {
 type Game struct {
 	player *player.Player
 	input  *input.InputState
+	world  *world.World
 }
 
 func NewGame() *Game {
@@ -78,6 +79,8 @@ func (g *Game) HandleInput() (types.Vec2, error) {
 }
 
 func (g *Game) Update() error {
+	dt := 1.0 / float64(ebiten.TPS())
+
 	// Update player animation count
 	g.player.UpdateAC()
 	g.player.UpdateLookDirection()
@@ -92,6 +95,8 @@ func (g *Game) Update() error {
 
 	// Reset running every frame
 	g.player.IsRunning = false
+
+	g.world.UpdateCamera(g.player.Pos, dt)
 
 	return nil
 }
