@@ -17,12 +17,12 @@ type Chunk [config.CHUNK_SIZE * config.CHUNK_SIZE]Tile
 // Each tile will reset to the basic tile type which is NONE
 func NewChunk(pNode *ChunkNode) *Chunk {
 	newChunk := Chunk{}
-	for x := range config.CHUNK_SIZE {
-		for y := range config.CHUNK_SIZE {
-			xnoise := float32(float32(pNode.topLeft.X) + float32(x)*config.TILE_SIZE)
-			ynoise := float32(float32(pNode.topLeft.Y) + float32(y)*config.TILE_SIZE)
+	for y := range config.CHUNK_SIZE {
+		for x := range config.CHUNK_SIZE {
+			xnoise := float32(float32(pNode.topLeft.X/config.TILE_SIZE)+float32(x)) * config.NOISE_FREQUENCY
+			ynoise := float32(float32(pNode.topLeft.Y/config.TILE_SIZE)+float32(y)) * config.NOISE_FREQUENCY
 			noiseValue := noiseGenerator.Eval(xnoise, ynoise)
-			newChunk[x+y*config.CHUNK_SIZE] = NewTile(noiseValue)
+			newChunk[x+config.CHUNK_SIZE*y] = NewTile(noiseValue)
 		}
 	}
 	return &newChunk
@@ -35,12 +35,10 @@ func NewChunk(pNode *ChunkNode) *Chunk {
 // A cache line is normaly 64 bytes long
 // So i need 4 cache lines for a whole chunk thats not to bad
 func (c *Chunk) GetTile(x, y int) Tile {
-	// Check if it is out of bounds
-	if y*config.CHUNK_SIZE+x < config.CHUNK_SIZE*config.CHUNK_SIZE {
-		return c[x+config.CHUNK_SIZE*y]
+	if x < 0 || y < 0 || x >= config.CHUNK_SIZE || y >= config.CHUNK_SIZE {
+		return NONE
 	}
-	// Its out of bounds so we return none because theres nothing...
-	return NONE
+	return c[x+config.CHUNK_SIZE*y]
 }
 
 // Print a 2D matrix representation of the chunk

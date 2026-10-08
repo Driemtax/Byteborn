@@ -14,6 +14,8 @@ const (
 	CHUNK_SIZE   = 16 // The width and height of a single chunk in tiles
 	CHUNK_WIDTH  = TILE_SIZE * CHUNK_SIZE
 	CHUNK_HEIGHT = TILE_SIZE * CHUNK_SIZE
+	// Noise Generation
+	NOISE_FREQUENCY = 0.002
 	// Chunk Matrix
 	CHUNK_MATRIX_X_AMOUNT = 16
 	CHUNK_MATRIX_Y_AMOUNT = 16
