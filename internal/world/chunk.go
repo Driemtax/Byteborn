@@ -1,8 +1,6 @@
 package world
 
 import (
-	"fmt"
-
 	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -24,7 +22,6 @@ func NewChunk(pNode *ChunkNode) *Chunk {
 			xnoise := float32(float32(pNode.topLeft.X) + float32(x)*config.TILE_SIZE)
 			ynoise := float32(float32(pNode.topLeft.Y) + float32(y)*config.TILE_SIZE)
 			noiseValue := noiseGenerator.Eval(xnoise, ynoise)
-			fmt.Println(noiseValue)
 			newChunk[x+y*config.CHUNK_SIZE] = NewTile(noiseValue)
 		}
 	}
