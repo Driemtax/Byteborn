@@ -1,11 +1,12 @@
 package player
 
 import (
-	"image/color"
+	"image"
 
+	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/pkg/types"
+	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 type Player struct {
@@ -13,57 +14,111 @@ type Player struct {
 	Pos       types.Vector2D
 	Speed     float64
 	IsRunning bool
+
+	// asset management
+	spriteSheet    *ebiten.Image
+	lookDirection  int
+	animationCount int
+	IsMoving       bool
+	LastDirection  types.Vector2D
 }
+
+type LookDirection int
+
+const (
+	LEFT LookDirection = iota
+	DOWN
+	RIGHT
+	UP
+)
+
+const (
+	HEIGHT = config.WINDOW_HEIGHT
+	WIDHT  = config.WINDOW_WIDTH
+	SPEED  = config.PLAYER_SPEED
+
+	TICK_UPDATE = config.TICK_UPDATE
+)
 
 func NewPlayer() *Player {
 	return &Player{
-		Size:  types.NewVector2D(40, 40),
-		Pos:   types.NewVector2D(380, 380),
-		Speed: 10.0,
+		Size:           types.NewVector2D(32, 32),
+		Pos:            types.NewVector2D(WIDHT/2, HEIGHT/2),
+		Speed:          SPEED,
+		IsRunning:      false,
+		spriteSheet:    util.LoadAsset("assets/Poke3.png"),
+		lookDirection:  int(DOWN),
+		animationCount: 0,
+		IsMoving:       false,
 	}
 }
 
-func (p *Player) Move(d types.Direction) error {
+// Updates the animationCount based on the tick count and the config on how fast the animation should be played
+func (p *Player) UpdateAC() {
+	if p.IsMoving {
+		if ebiten.Tick()%int64(TICK_UPDATE) == 0 {
+			p.animationCount = 1 + (p.animationCount & 1) // = p.animationCount % 2
+		}
+	} else {
+		p.animationCount = 0 // standing position sprite
+	}
+}
+
+// Updates the lookDirection of the player based on the last move it made.
+// Diagonal movement results in a look direction of left or right
+func (p *Player) UpdateLookDirection() {
+	switch {
+	case p.LastDirection.X == -1:
+		p.lookDirection = int(LEFT)
+	case p.LastDirection.X == 1:
+		p.lookDirection = int(RIGHT)
+	case p.LastDirection.Y == -1:
+		p.lookDirection = int(UP)
+	case p.LastDirection.Y == 1:
+		p.lookDirection = int(DOWN)
+	}
+}
+
+func (p *Player) Move(dir types.Vector2D) error {
 	actualSpeed := p.Speed
 	if p.IsRunning {
-		actualSpeed *= 2
+		actualSpeed *= 1.5
 	}
 
-	switch d {
-	case types.UNDEFINED:
-	case types.UP:
-		// if u ask yourself why i subtracted 10 here, you asked a very good question, but it works so get on with it :)
-		p.Pos.Y -= actualSpeed
-		// if p.Pos.Y >= (p.Size.Y/2)-10 {
-		// }
-	case types.DOWN:
-		p.Pos.Y += actualSpeed
-		// if p.Pos.Y <= 790-(p.Size.Y) {
-		// }
-	case types.LEFT:
-		p.Pos.X -= actualSpeed
-		// if p.Pos.X >= (p.Size.X/2)-10 {
-		// }
-	case types.RIGHT:
-		p.Pos.X += actualSpeed
-		// if p.Pos.X <= 790-(p.Size.X) {
-		// }
-	}
+	// Normalize the direction. That garantuees, that diagonal movement is NOT faster as horizontal or vertical movement.
+	// See docs for further details.
+	dir = dir.Normalize()
+
+	// calculate velocity of movement
+	v := dir.Mul(actualSpeed)
+
+	newPos := types.NewVector2D(0, 0)
+
+	// Apply the move. This function holds for all directions. See documentation for further eplanations on this formula
+	newPos.X = max(0, min(p.Pos.X+v.X, WIDHT-p.Size.X))  // TODO: Add variable for Window width
+	newPos.Y = max(0, min(p.Pos.Y+v.Y, HEIGHT-p.Size.Y)) // TODO: Add variable for Window height
+
+	// TODO: Check if newPos is legit with map api (cant walk on water etc.)
+	// For now we assume it is.
+	p.Pos.X = newPos.X
+	p.Pos.Y = newPos.Y
+
 	return nil
 }
 
-func (p *Player) GetPos() types.Vec2 {
-	return p.Pos
-}
+func (p *Player) Draw(screen *ebiten.Image) {
+	// Get the coordinates of the correct sprite from spriteSheet
+	xStart := p.animationCount * int(p.Size.X)
+	yStart := p.lookDirection * int(p.Size.Y)
+	xEnd := xStart + int(p.Size.X)
+	yEnd := yStart + int(p.Size.Y)
 
-func (p *Player) Draw(screen *ebiten.Image, camPos types.Vec2) {
-	vector.FillRect(
-		screen,
-		float32(p.Pos.X-camPos.X),
-		float32(p.Pos.Y-camPos.Y),
-		float32(p.Size.X-(p.Size.X/2)),
-		float32(p.Size.Y-(p.Size.Y/2)),
-		color.RGBA{R: 255, G: 255, B: 255, A: 255},
-		true,
-	)
+	// create a Rectangle to cut out the sprite of the spriteSheet
+	portion := image.Rect(xStart, yStart, xEnd, yEnd)
+	pixels := p.spriteSheet.SubImage(portion).(*ebiten.Image)
+
+	// lastly just draw the image to the screen at the right position
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(p.Pos.X, p.Pos.Y)
+	screen.DrawImage(pixels, op)
 }
