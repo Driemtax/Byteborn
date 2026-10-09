@@ -15,10 +15,15 @@ type Chunk [config.CHUNK_SIZE * config.CHUNK_SIZE]Tile
 
 // Returns a new chunk
 // Each tile will reset to the basic tile type which is NONE
-func NewChunk() *Chunk {
+func NewChunk(pNode *ChunkNode) *Chunk {
 	newChunk := Chunk{}
-	for n := range config.CHUNK_SIZE * config.CHUNK_SIZE {
-		newChunk[n] = NewTile()
+	for x := range config.CHUNK_SIZE {
+		for y := range config.CHUNK_SIZE {
+			xnoise := float32(float32(pNode.topLeft.X) + float32(x)*config.TILE_SIZE)
+			ynoise := float32(float32(pNode.topLeft.Y) + float32(y)*config.TILE_SIZE)
+			noiseValue := noiseGenerator.Eval(xnoise, ynoise)
+			newChunk[x+y*config.CHUNK_SIZE] = NewTile(noiseValue)
+		}
 	}
 	return &newChunk
 }

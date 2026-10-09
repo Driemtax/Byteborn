@@ -1,14 +1,16 @@
 package world
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/kelindar/noise"
 )
+
+var noiseGenerator *noise.Simplex
 
 type World struct {
 	maxWorldSize int
@@ -21,7 +23,8 @@ type World struct {
 func NewWorld() *World {
 	maxChunkAmount := math.Pow(2, config.CHUNK_TREE_MAX_DEPTH)
 	maxWorldSize := maxChunkAmount * config.CHUNK_WIDTH
-	fmt.Println(maxWorldSize)
+	noiseSeed := 12
+	noiseGenerator = noise.NewSimplex(uint32(noiseSeed))
 	return &World{
 		maxWorldSize: int(maxWorldSize),
 		chunkTree:    CreateChunkTree(),
@@ -65,9 +68,7 @@ func (w *World) UpdateCamera(camTarget types.Vec2, dt float64) error {
 		0,
 		float64(w.maxWorldSize-config.WINDOW_WIDTH),
 		float64(w.maxWorldSize-config.WINDOW_HEIGHT),
-	)
-
-	fmt.Println(w.cameraPos)
+	).Trunc()
 
 	return nil
 }
@@ -81,4 +82,8 @@ func (w *World) Draw(screen *ebiten.Image) {
 	for _, node := range chunkNodes {
 		node.Draw(screen, w.cameraPos)
 	}
+}
+
+func (w *World) GetCameraPos() types.Vec2 {
+	return w.cameraPos
 }

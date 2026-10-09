@@ -9,28 +9,6 @@ The things that i want to achieve with the world package:
 - The Camera follows the player slowly behind him
 - The World receives the width of of the used screen and determines automatically how many tiles will be needed
 
-# First Idea Chunks as Nodes
-
-```go
-type ChunkNode struct {
-	currentChunk *Chunk
-	north 			 *Chunk
-	east 				 *Chunk
-	south        *Chunk
-	west      	 *Chunk
-}
-```
-
-This Approach sadly does not work because starting from the root node. The root->north->west chunk and the root->west->north chunk are the same. So there is already a collision.
-
-# Second Idea
-
-Normal matrix but way to boring.... I wont go deeper into it
-
-# Third Idea
-
-Im using my first idea but this time im going to use the correct data structure a quad tree :). And using that it works
-
 ```go
 type ChunkNode struct {
 	topLeftPoint Vec2

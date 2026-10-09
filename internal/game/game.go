@@ -8,6 +8,7 @@ import (
 	"github.com/Driemtax/Byteborn/internal/debug"
 	"github.com/Driemtax/Byteborn/internal/player"
 	"github.com/Driemtax/Byteborn/internal/scene"
+	"github.com/Driemtax/Byteborn/internal/world"
 	"github.com/Driemtax/Byteborn/pkg/input"
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -32,12 +33,14 @@ func init() {
 type Game struct {
 	player  *player.Player
 	input   *input.InputState
+	world   *world.World
 	overlay *debug.Overlay
 }
 
 func NewGame() *Game {
 	return &Game{
 		player:  player.NewPlayer(),
+		world:   world.NewWorld(),
 		overlay: debug.NewOverlay(),
 	}
 }
@@ -80,6 +83,8 @@ func (g *Game) HandleInput() (types.Vec2, error) {
 }
 
 func (g *Game) Update() error {
+	dt := 1.0 / float64(ebiten.TPS())
+
 	// Update player animation count
 	g.player.UpdateAC()
 	g.player.UpdateLookDirection()
@@ -106,11 +111,14 @@ func (g *Game) Update() error {
 	// Reset running every frame
 	g.player.IsRunning = false
 
+	g.world.UpdateCamera(g.player.Pos, dt)
+
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.player.Draw(screen)
+	g.world.Draw(screen)
+	g.player.Draw(screen, g.world.GetCameraPos())
 	g.drawDebugOverlay(screen)
 }
 
