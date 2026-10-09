@@ -95,6 +95,12 @@ func (v Vec2) Mul(scalar float64) Vec2 {
 	return Vec2{v.X * scalar, v.Y * scalar}
 }
 
+// HadProd returns the hadamar product of vectors v1 and v2. This means every component of both vectors will be multiplied.
+// It does not modify the original vector v.
+func (v Vec2) HadProd(other Vec2) Vec2 {
+	return Vec2{v.X * other.X, v.Y * other.Y}
+}
+
 // LengthSq returns the squared magnitude (length) of the vector (v.X*v.X + v.Y*v.Y).
 // This is computationally cheaper than Len() as it avoids the square root calculation.
 // Useful for comparing vector lengths.
