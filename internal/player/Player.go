@@ -32,6 +32,32 @@ const (
 	UP
 )
 
+func (d LookDirection) String() string {
+	switch d {
+	case LEFT:
+		return "LEFT"
+	case DOWN:
+		return "DOWN"
+	case RIGHT:
+		return "RIGHT"
+	case UP:
+		return "UP"
+	}
+	return "UNKNOWN"
+}
+
+// LookDir returns the direction the player is currently facing.
+// This is the row index into the sprite sheet.
+func (p *Player) LookDir() LookDirection {
+	return LookDirection(p.lookDirection)
+}
+
+// AnimationFrame returns the current column index into the sprite sheet.
+// 0 is the standing pose, 1 and 2 are the walking poses.
+func (p *Player) AnimationFrame() int {
+	return p.animationCount
+}
+
 const (
 	HEIGHT = config.WINDOW_HEIGHT
 	WIDHT  = config.WINDOW_WIDTH
