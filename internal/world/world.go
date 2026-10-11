@@ -25,13 +25,15 @@ func NewWorld() *World {
 	maxWorldSize := maxChunkAmount * config.CHUNK_WIDTH
 	noiseSeed := 12
 	noiseGenerator = noise.NewSimplex(uint32(noiseSeed))
+	maxSize := maxChunkAmount * config.CHUNK_WIDTH
+	root := NewChunkNode(types.Vec2{X: 0, Y: 0}, types.Vec2{X: maxSize, Y: maxSize}, 0)
+
 	return &World{
 		maxWorldSize: int(maxWorldSize),
-		chunkTree:    CreateChunkTree(),
+		chunkTree:    root,
 		cameraSpeed:  config.CAMERA_SPEED,
 	}
 }
-
 func (w *World) UpdateCamera(camTarget types.Vec2, dt float64) error {
 	// Calculate the target position for the camera
 	// The camera will always try to keep the target in the center of the screen

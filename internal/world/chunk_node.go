@@ -125,6 +125,10 @@ func (cn *ChunkNode) getChunkNodesTouchingSquare(tl, br types.Vec2) []*ChunkNode
 		return []*ChunkNode{cn}
 	}
 
+	if cn.topLeftNode == nil {
+		cn.createChildren()
+	}
+
 	chunkNodes := []*ChunkNode{}
 	chunkNodes = append(chunkNodes, cn.topLeftNode.getChunkNodesTouchingSquare(tl, br)...)
 	chunkNodes = append(chunkNodes, cn.topRightNode.getChunkNodesTouchingSquare(tl, br)...)
@@ -132,6 +136,43 @@ func (cn *ChunkNode) getChunkNodesTouchingSquare(tl, br types.Vec2) []*ChunkNode
 	chunkNodes = append(chunkNodes, cn.botRightNode.getChunkNodesTouchingSquare(tl, br)...)
 
 	return chunkNodes
+}
+
+func (cn *ChunkNode) createChildren() {
+	if cn.depth == config.CHUNK_TREE_MAX_DEPTH {
+		return
+	}
+
+	parentWidth := cn.botRight.X - cn.topLeft.X
+	parentHeight := cn.botRight.Y - cn.topLeft.Y
+	centerDisplacementWidth := parentWidth / 2
+	centerDisplacementHeight := parentHeight / 2
+	nextDepth := cn.depth + 1
+
+	// Top Left
+	cn.topLeftNode = NewChunkNode(
+		cn.topLeft,
+		types.Vec2{X: cn.topLeft.X + centerDisplacementWidth, Y: cn.topLeft.Y + centerDisplacementHeight},
+		nextDepth,
+	)
+	// Top Right
+	cn.topRightNode = NewChunkNode(
+		types.Vec2{X: cn.topLeft.X + centerDisplacementWidth, Y: cn.topLeft.Y},
+		types.Vec2{X: cn.botRight.X, Y: cn.topLeft.Y + centerDisplacementHeight},
+		nextDepth,
+	)
+	// Bottom Left
+	cn.botLeftNode = NewChunkNode(
+		types.Vec2{X: cn.topLeft.X, Y: cn.topLeft.Y + centerDisplacementHeight},
+		types.Vec2{X: cn.topLeft.X + centerDisplacementWidth, Y: cn.botRight.Y},
+		nextDepth,
+	)
+	// Bottom Right
+	cn.botRightNode = NewChunkNode(
+		types.Vec2{X: cn.topLeft.X + centerDisplacementWidth, Y: cn.topLeft.Y + centerDisplacementHeight},
+		cn.botRight,
+		nextDepth,
+	)
 }
 
 // Checks if the given Point is inside of the ChunkNode
