@@ -2,6 +2,7 @@ package world
 
 import (
 	"math"
+	"math/rand/v2"
 
 	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/pkg/types"
@@ -23,8 +24,7 @@ type World struct {
 func NewWorld() *World {
 	maxChunkAmount := math.Pow(2, config.CHUNK_TREE_MAX_DEPTH)
 	maxWorldSize := maxChunkAmount * config.CHUNK_WIDTH
-	noiseSeed := 12
-	noiseGenerator = noise.NewSimplex(uint32(noiseSeed))
+	noiseGenerator = noise.NewSimplex(rand.Uint32())
 	maxSize := maxChunkAmount * config.CHUNK_WIDTH
 	root := NewChunkNode(types.Vec2{X: 0, Y: 0}, types.Vec2{X: maxSize, Y: maxSize}, 0)
 
