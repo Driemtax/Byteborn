@@ -75,7 +75,7 @@ func (w *World) UpdateCamera(camTarget types.Vec2, dt float64) error {
 
 func (w *World) Draw(screen *ebiten.Image) {
 	screenWidth, screenHeight := screen.Bounds().Dx(), screen.Bounds().Dy()
-	chunkNodes := w.chunkTree.GetChunkNodesTouchingSquare(
+	chunkNodes := w.chunkTree.getChunkNodesTouchingSquare(
 		w.cameraPos,
 		types.Vec2{X: w.cameraPos.X + float64(screenWidth), Y: w.cameraPos.Y + float64(screenHeight)},
 	)

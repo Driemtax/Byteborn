@@ -3,6 +3,7 @@ package world
 import (
 	"fmt"
 
+	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -14,6 +15,7 @@ type ChunkNode struct {
 	botRight types.Vec2 // The bottom right corner of the ChunkNode
 
 	chunk *Chunk
+	depth int
 
 	topLeftNode  *ChunkNode
 	topRightNode *ChunkNode
@@ -21,10 +23,11 @@ type ChunkNode struct {
 	botRightNode *ChunkNode
 }
 
-func NewChunkNode(topLeft, botRight types.Vec2) *ChunkNode {
+func NewChunkNode(topLeft, botRight types.Vec2, chunkDepth int) *ChunkNode {
 	return &ChunkNode{
 		topLeft:  topLeft,
 		botRight: botRight,
+		depth:    chunkDepth,
 	}
 }
 
@@ -85,39 +88,40 @@ func (cn *ChunkNode) GetChunkForPosition(pos types.Vec2) (*Chunk, error) {
 	return nil, fmt.Errorf("GetChunkForPosition: This Error Should Never Occur: %s, Position: %s", cn.String(), pos.String())
 }
 
+// Is currently not used!!!
 // GetChukstouchingSquare: This function returns all the chunks that touch the given Rectangle
 // The Idea is that later i can pass the current screen and render all the chunks that are currently
 // on the screen
-func (cn *ChunkNode) GetChunksTouchingSquare(tl, br types.Vec2) []*Chunk {
-	if !cn.TouchesSq(tl, br) {
-		return []*Chunk{}
-	}
-	if cn.chunk != nil {
-		return []*Chunk{cn.chunk}
-	}
+// func (cn *ChunkNode) GetChunksTouchingSquare(tl, br types.Vec2) []*Chunk {
+// 	if !cn.TouchesSq(tl, br) {
+// 		return []*Chunk{}
+// 	}
+// 	if cn.chunk != nil {
+// 		return []*Chunk{cn.chunk}
+// 	}
 
-	chunks := []*Chunk{}
-	chunks = append(chunks, cn.topLeftNode.GetChunksTouchingSquare(tl, br)...)
-	chunks = append(chunks, cn.topRightNode.GetChunksTouchingSquare(tl, br)...)
-	chunks = append(chunks, cn.botLeftNode.GetChunksTouchingSquare(tl, br)...)
-	chunks = append(chunks, cn.botRightNode.GetChunksTouchingSquare(tl, br)...)
+// 	chunks := []*Chunk{}
+// 	chunks = append(chunks, cn.topLeftNode.GetChunksTouchingSquare(tl, br)...)
+// 	chunks = append(chunks, cn.topRightNode.GetChunksTouchingSquare(tl, br)...)
+// 	chunks = append(chunks, cn.botLeftNode.GetChunksTouchingSquare(tl, br)...)
+// 	chunks = append(chunks, cn.botRightNode.GetChunksTouchingSquare(tl, br)...)
 
-	return chunks
-}
+// 	return chunks
+// }
 
-func (cn *ChunkNode) GetChunkNodesTouchingSquare(tl, br types.Vec2) []*ChunkNode {
+func (cn *ChunkNode) getChunkNodesTouchingSquare(tl, br types.Vec2) []*ChunkNode {
 	if !cn.TouchesSq(tl, br) {
 		return []*ChunkNode{}
 	}
-	if cn.chunk != nil {
+	if cn.depth == config.CHUNK_TREE_MAX_DEPTH {
 		return []*ChunkNode{cn}
 	}
 
 	chunkNodes := []*ChunkNode{}
-	chunkNodes = append(chunkNodes, cn.topLeftNode.GetChunkNodesTouchingSquare(tl, br)...)
-	chunkNodes = append(chunkNodes, cn.topRightNode.GetChunkNodesTouchingSquare(tl, br)...)
-	chunkNodes = append(chunkNodes, cn.botLeftNode.GetChunkNodesTouchingSquare(tl, br)...)
-	chunkNodes = append(chunkNodes, cn.botRightNode.GetChunkNodesTouchingSquare(tl, br)...)
+	chunkNodes = append(chunkNodes, cn.topLeftNode.getChunkNodesTouchingSquare(tl, br)...)
+	chunkNodes = append(chunkNodes, cn.topRightNode.getChunkNodesTouchingSquare(tl, br)...)
+	chunkNodes = append(chunkNodes, cn.botLeftNode.getChunkNodesTouchingSquare(tl, br)...)
+	chunkNodes = append(chunkNodes, cn.botRightNode.getChunkNodesTouchingSquare(tl, br)...)
 
 	return chunkNodes
 }
