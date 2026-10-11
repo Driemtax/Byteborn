@@ -109,11 +109,19 @@ func (cn *ChunkNode) GetChunkForPosition(pos types.Vec2) (*Chunk, error) {
 // 	return chunks
 // }
 
+// Searches for all chunknodes in the given rectangle.
+// If the chunktree hasn't been created to this point,
+// the function will create the missing chunks and add
+// them to the chunktree. (hopefully -.-)
 func (cn *ChunkNode) getChunkNodesTouchingSquare(tl, br types.Vec2) []*ChunkNode {
 	if !cn.TouchesSq(tl, br) {
 		return []*ChunkNode{}
 	}
 	if cn.depth == config.CHUNK_TREE_MAX_DEPTH {
+		if cn.chunk == nil {
+			// Create the chunk if it has not been created yet
+			cn.chunk = NewChunk(cn)
+		}
 		return []*ChunkNode{cn}
 	}
 
