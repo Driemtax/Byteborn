@@ -1,4 +1,4 @@
-package world
+package tile
 
 import (
 	"fmt"
@@ -23,13 +23,13 @@ const (
 )
 
 var TILE_DETAILS = [MAX_TILE_AMOUNT]TileDetail{
-	{name: "None", abbreviation: "##", color: color.RGBA{R: 0, G: 0, B: 0, A: 255}},
-	{name: "Grass", abbreviation: "GR", color: color.RGBA{R: 0, G: 230, B: 0, A: 255}},
-	{name: "Path", abbreviation: "PA", color: color.RGBA{R: 150, G: 150, B: 10, A: 255}},
-	{name: "Wall", abbreviation: "WA", color: color.RGBA{R: 255, G: 0, B: 0, A: 255}},
-	{name: "Test", abbreviation: "WA", color: color.RGBA{R: 255, G: 255, B: 0, A: 255}},
-	{name: "Test2", abbreviation: "WA", color: color.RGBA{R: 0, G: 255, B: 255, A: 255}},
-	{name: "Test3", abbreviation: "WA", color: color.RGBA{R: 20, G: 20, B: 20, A: 255}},
+	{name: "None", abbreviation: "##", color: color.RGBA{R: 68, G: 1, B: 84, A: 255}},
+	{name: "Grass", abbreviation: "GR", color: color.RGBA{R: 65, G: 68, B: 135, A: 255}},
+	{name: "Path", abbreviation: "PA", color: color.RGBA{R: 42, G: 120, B: 142, A: 255}},
+	{name: "Wall", abbreviation: "WA", color: color.RGBA{R: 34, G: 168, B: 132, A: 255}},
+	{name: "Test", abbreviation: "WA", color: color.RGBA{R: 122, G: 209, B: 81, A: 255}},
+	{name: "Test2", abbreviation: "WA", color: color.RGBA{R: 189, G: 223, B: 38, A: 255}},
+	{name: "Test3", abbreviation: "WA", color: color.RGBA{R: 253, G: 231, B: 37, A: 255}},
 }
 
 func NewTile(noiseValue float32) Tile {

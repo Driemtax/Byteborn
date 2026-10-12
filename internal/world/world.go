@@ -5,35 +5,39 @@ import (
 	"math/rand/v2"
 
 	"github.com/Driemtax/Byteborn/internal/config"
+	"github.com/Driemtax/Byteborn/internal/world/chunk"
+	"github.com/Driemtax/Byteborn/internal/world/generation"
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/kelindar/noise"
 )
-
-var noiseGenerator *noise.Simplex
 
 type World struct {
 	maxWorldSize int
-	chunkTree    *ChunkNode
+	// Camera
 	cameraPos    types.Vec2
 	cameraTarget types.Vec2
 	cameraSpeed  float64
+	// Noise Generation
+	genCtx *generation.Ctx
+	// Chunk Tree
+	tree *chunk.Tree
 }
 
 func NewWorld() *World {
 	maxChunkAmount := math.Pow(2, config.CHUNK_TREE_MAX_DEPTH)
 	maxWorldSize := maxChunkAmount * config.CHUNK_WIDTH
-	noiseGenerator = noise.NewSimplex(rand.Uint32())
+	newGenCtx := generation.NewCtx(rand.Uint32())
 	maxSize := maxChunkAmount * config.CHUNK_WIDTH
-	root := NewChunkNode(types.Vec2{X: 0, Y: 0}, types.Vec2{X: maxSize, Y: maxSize}, 0)
 
 	return &World{
 		maxWorldSize: int(maxWorldSize),
-		chunkTree:    root,
 		cameraSpeed:  config.CAMERA_SPEED,
+		genCtx:       newGenCtx,
+		tree:         chunk.NewTree(maxSize, newGenCtx),
 	}
 }
+
 func (w *World) UpdateCamera(camTarget types.Vec2, dt float64) error {
 	// Calculate the target position for the camera
 	// The camera will always try to keep the target in the center of the screen
@@ -77,7 +81,7 @@ func (w *World) UpdateCamera(camTarget types.Vec2, dt float64) error {
 
 func (w *World) Draw(screen *ebiten.Image) {
 	screenWidth, screenHeight := screen.Bounds().Dx(), screen.Bounds().Dy()
-	chunkNodes := w.chunkTree.getChunkNodesTouchingSquare(
+	chunkNodes := w.tree.GetChunkNodesTouchingSquare(
 		w.cameraPos,
 		types.Vec2{X: w.cameraPos.X + float64(screenWidth), Y: w.cameraPos.Y + float64(screenHeight)},
 	)
