@@ -1,4 +1,4 @@
-package world
+package tile
 
 import "image/color"
 
