@@ -1,6 +1,7 @@
 package game
 
 import (
+	"image/color"
 	"log"
 	"os"
 
@@ -11,7 +12,9 @@ import (
 	"github.com/Driemtax/Byteborn/internal/world"
 	"github.com/Driemtax/Byteborn/pkg/input"
 	"github.com/Driemtax/Byteborn/pkg/types"
+	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 const (
@@ -22,6 +25,8 @@ const (
 	SCALED_HEIGHT = HEIGHT * SCALE
 
 	TPS = config.TPS
+
+	FONT_SIZE = config.PRESS_START_2P_SIZE
 )
 
 func init() {
@@ -117,9 +122,26 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.world.Draw(screen)
-	g.player.Draw(screen, g.world.GetCameraPos())
-	g.drawDebugOverlay(screen)
+	// --- FONT TEST ---
+	util.InitFont()
+	x := screen.Bounds().Dx() / 2
+	x = x - (x / 2)
+	y := screen.Bounds().Dy() / 2
+	msg := "This is a font test."
+	op := &text.DrawOptions{}
+	op.GeoM.Translate(float64(x), float64(y))
+	op.ColorScale.ScaleWithColor(color.White)
+
+	text.Draw(screen, msg, &text.GoTextFace{
+		Source: util.GetFaceSource(),
+		Size:   FONT_SIZE,
+	}, op)
+
+	// ---
+
+	//g.world.Draw(screen)
+	//g.player.Draw(screen, g.world.GetCameraPos())
+	//g.drawDebugOverlay(screen)
 }
 
 // drawDebugOverlay feeds the current game state into the overlay and renders it.
