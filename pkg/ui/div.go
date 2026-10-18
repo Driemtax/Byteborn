@@ -37,7 +37,8 @@ func (d *Div) Update(posX, posY int) {
 
 func (d *Div) Draw(screen *ebiten.Image) {
 	// Draw a black border for the whole div to make it visible
-	vector.FillRect(screen, float32(d.posX), float32(d.posY), float32(d.width), float32(d.height), color.Black, true)
+	//vector.FillRect(screen, float32(d.posX), float32(d.posY), float32(d.width), float32(d.height), color.Black, true)
+	vector.StrokeRect(screen, float32(d.posX), float32(d.posY), float32(d.width), float32(d.height), 2.0, color.Black, true)
 
 	// Draw text in the middle of the div
 	x := (d.width / 2) + d.posX
