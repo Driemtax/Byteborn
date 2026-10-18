@@ -1,7 +1,6 @@
 package game
 
 import (
-	"image/color"
 	"log"
 	"os"
 
@@ -12,9 +11,9 @@ import (
 	"github.com/Driemtax/Byteborn/internal/world"
 	"github.com/Driemtax/Byteborn/pkg/input"
 	"github.com/Driemtax/Byteborn/pkg/types"
+	"github.com/Driemtax/Byteborn/pkg/ui"
 	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 const (
@@ -36,17 +35,23 @@ func init() {
 }
 
 type Game struct {
+	font    *util.Font
 	player  *player.Player
 	input   *input.InputState
 	world   *world.World
 	overlay *debug.Overlay
+
+	// ui components
+	divs []ui.Div
 }
 
 func NewGame() *Game {
 	return &Game{
+		font:    util.InitFont(),
 		player:  player.NewPlayer(),
 		world:   world.NewWorld(),
 		overlay: debug.NewOverlay(),
+		divs:    []ui.Div{*ui.NewDiv(200, 100, "This is a div test.")},
 	}
 }
 
@@ -122,26 +127,18 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	// --- FONT TEST ---
-	util.InitFont()
-	x := screen.Bounds().Dx() / 2
-	x = x - (x / 2)
-	y := screen.Bounds().Dy() / 2
-	msg := "This is a font test."
-	op := &text.DrawOptions{}
-	op.GeoM.Translate(float64(x), float64(y))
-	op.ColorScale.ScaleWithColor(color.White)
+	// Test for divs
+	g.divs[0].Update(screen.Bounds().Dx()/2, screen.Bounds().Dy()/2)
 
-	text.Draw(screen, msg, &text.GoTextFace{
-		Source: util.GetFaceSource(),
-		Size:   FONT_SIZE,
-	}, op)
+	g.world.Draw(screen)
 
-	// ---
+	// draw all divs to the screen
+	for _, d := range g.divs {
+		d.Draw(screen)
+	}
 
-	//g.world.Draw(screen)
-	//g.player.Draw(screen, g.world.GetCameraPos())
-	//g.drawDebugOverlay(screen)
+	g.player.Draw(screen, g.world.GetCameraPos())
+	g.drawDebugOverlay(screen)
 }
 
 // drawDebugOverlay feeds the current game state into the overlay and renders it.

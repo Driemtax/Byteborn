@@ -36,5 +36,5 @@ const (
 	// -----------------
 	// --- F O N T S ---
 	// -----------------
-	PRESS_START_2P_SIZE = 16
+	PRESS_START_2P_SIZE = 8
 )
