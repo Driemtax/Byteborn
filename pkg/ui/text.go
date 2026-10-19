@@ -23,6 +23,8 @@ func NewText(msg string, justificationX text.Align, justificationY text.Align) *
 	}
 }
 
-func (t *Text) Draw(screen *ebiten.Image, posX int, posY int) {
-	t.font.Draw(screen, posX, posY, t.content, t.justificationX, t.justificationY)
+func (t *Text) Draw(screen *ebiten.Image, posX int, posY int, width int, height int) {
+	midX := posX + (width / 2)
+	midY := posY + (height / 2)
+	t.font.Draw(screen, midX, midY, t.content, t.justificationX, t.justificationY)
 }

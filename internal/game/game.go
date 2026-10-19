@@ -97,6 +97,7 @@ func (g *Game) InitUI() {
 	logoY := 20
 	logoDiv := ui.NewDiv(logoWidth, logoHeight, logoX, logoY)
 	g.components = append(g.components, *logoDiv)
+	// -------------------------------------------------------------------------
 
 	// --- BUTTONS DIV --
 	selectionWidth := config.WINDOW_WIDTH / 3
@@ -104,6 +105,13 @@ func (g *Game) InitUI() {
 	selectionX := (config.WINDOW_WIDTH / 2) - (selectionWidth / 2)
 	selectionY := titleY + titleHeight + PADDING
 	selectionDiv := ui.NewDiv(selectionWidth, selectionHeight, selectionX, selectionY)
+	// TODO: 3 Buttons here
+	bm := ui.NewButtonManager()
+	bm.AddNewButton("Start", false)
+	bm.AddNewButton("Settings", false)
+	bm.AddNewButton("Quit", false)
+	selectionDiv.AddChild(bm)
+
 	g.components = append(g.components, *selectionDiv)
 
 }
