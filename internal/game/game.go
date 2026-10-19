@@ -97,6 +97,15 @@ func (g *Game) InitUI() {
 	logoY := 20
 	logoDiv := ui.NewDiv(logoWidth, logoHeight, logoX, logoY)
 	g.components = append(g.components, *logoDiv)
+
+	// --- BUTTONS DIV --
+	selectionWidth := config.WINDOW_WIDTH / 3
+	selectionHeight := (config.WINDOW_HEIGHT/3)*2 - 3*PADDING
+	selectionX := (config.WINDOW_WIDTH / 2) - (selectionWidth / 2)
+	selectionY := titleY + titleHeight + PADDING
+	selectionDiv := ui.NewDiv(selectionWidth, selectionHeight, selectionX, selectionY)
+	g.components = append(g.components, *selectionDiv)
+
 }
 
 func (g *Game) HandleInput() (types.Vec2, error) {
