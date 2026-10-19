@@ -14,6 +14,15 @@ type Text struct {
 	justificationY text.Align
 }
 
+func NewText(msg string, justificationX text.Align, justificationY text.Align) *Text {
+	return &Text{
+		font:           util.InitFont(),
+		content:        msg,
+		justificationX: justificationX,
+		justificationY: justificationY,
+	}
+}
+
 func (t *Text) Draw(screen *ebiten.Image, posX int, posY int) {
 	t.font.Draw(screen, posX, posY, t.content, t.justificationX, t.justificationY)
 }

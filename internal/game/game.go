@@ -14,6 +14,7 @@ import (
 	"github.com/Driemtax/Byteborn/pkg/ui"
 	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 const (
@@ -26,6 +27,14 @@ const (
 	TPS = config.TPS
 
 	FONT_SIZE = config.PRESS_START_2P_SIZE
+	PADDING   = 20
+)
+
+type SCENE_STATE int
+
+const (
+	MENU SCENE_STATE = iota
+	INGAME
 )
 
 func init() {
@@ -42,7 +51,8 @@ type Game struct {
 	overlay *debug.Overlay
 
 	// ui components
-	divs []ui.Div
+	scene_state SCENE_STATE
+	components  []ui.Div
 }
 
 func NewGame() *Game {
@@ -51,8 +61,42 @@ func NewGame() *Game {
 		player:  player.NewPlayer(),
 		world:   world.NewWorld(),
 		overlay: debug.NewOverlay(),
-		divs:    []ui.Div{*ui.NewDiv(200, 100, "This is a div test.")},
+
+		// UI
+		scene_state: INGAME,
+		components:  []ui.Div{},
 	}
+}
+
+func (g *Game) InitGame() {
+	g.InitUI()
+	g.scene_state = MENU
+}
+
+func (g *Game) InitUI() {
+	// --- MAIN DIV ---
+	mainDiv := ui.NewDiv(config.WINDOW_WIDTH, config.WINDOW_HEIGHT, 0, 0)
+	g.components = append(g.components, *mainDiv)
+	// ------------------------------------------------------------------------
+
+	// --- TITLE DIV ---
+	titleWidth := (config.WINDOW_WIDTH/3)*2 - 2*PADDING
+	titleHeight := config.WINDOW_HEIGHT / 3
+	titleX := (config.WINDOW_WIDTH / 3) + PADDING
+	titleY := 20
+	titleDiv := ui.NewDiv(titleWidth, titleHeight, titleX, titleY)
+	titleText := ui.NewText("Byteborn", text.AlignCenter, text.AlignCenter)
+	titleDiv.AddChild(titleText)
+	g.components = append(g.components, *titleDiv)
+	// -------------------------------------------------------------------------
+
+	// --- LOGO DIV ---
+	logoWidth := (config.WINDOW_WIDTH/3)*1 - PADDING
+	logoHeight := config.WINDOW_HEIGHT / 3
+	logoX := 20
+	logoY := 20
+	logoDiv := ui.NewDiv(logoWidth, logoHeight, logoX, logoY)
+	g.components = append(g.components, *logoDiv)
 }
 
 func (g *Game) HandleInput() (types.Vec2, error) {
@@ -106,9 +150,32 @@ func (g *Game) Update() error {
 		g.overlay.Toggle()
 	}
 
-	// Check for ESC
+	// Handle input accordingly to selected scene
+	switch g.scene_state {
+	case MENU:
+		g.handleMenuInput()
+	case INGAME:
+		g.handleIngameInput(dt)
+	}
+
+	return nil
+}
+
+func (g *Game) handleMenuInput() {
+	// TODO Handle Menu Input, so div.OnKeyPress or something or probably Menu struct which holds the div
 	if g.input.ESC {
 		os.Exit(0)
+	}
+
+	if g.input.ENTER {
+		g.scene_state = INGAME
+	}
+}
+
+func (g *Game) handleIngameInput(dt float64) {
+	// Check for ESC
+	if g.input.ESC {
+		g.scene_state = MENU
 	}
 
 	dir, err := g.HandleInput()
@@ -122,21 +189,28 @@ func (g *Game) Update() error {
 	g.player.IsRunning = false
 
 	g.world.UpdateCamera(g.player.Pos, dt)
-
-	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Test for divs
-	g.divs[0].Update(screen.Bounds().Dx()/2, screen.Bounds().Dy()/2)
+	// Draw components accordingly to the scene state
 
-	g.world.Draw(screen)
+	switch g.scene_state {
+	case MENU:
+		g.drawMenu(screen)
+	case INGAME:
+		g.drawIngame(screen)
+	}
+}
 
+func (g *Game) drawMenu(screen *ebiten.Image) {
 	// draw all divs to the screen
-	for _, d := range g.divs {
+	for _, d := range g.components {
 		d.Draw(screen)
 	}
+}
 
+func (g *Game) drawIngame(screen *ebiten.Image) {
+	g.world.Draw(screen)
 	g.player.Draw(screen, g.world.GetCameraPos())
 	g.drawDebugOverlay(screen)
 }
