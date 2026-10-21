@@ -96,6 +96,10 @@ func (g *Game) InitUI() {
 	logoX := 20
 	logoY := 20
 	logoDiv := ui.NewDiv(logoWidth, logoHeight, logoX, logoY, true)
+
+	pic := ui.NewPicture("assets/title_menu/Title_Monster.png")
+	logoDiv.AddChild(pic)
+
 	g.components = append(g.components, *logoDiv)
 	// -------------------------------------------------------------------------
 
