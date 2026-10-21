@@ -75,7 +75,7 @@ func (g *Game) InitGame() {
 
 func (g *Game) InitUI() {
 	// --- MAIN DIV ---
-	mainDiv := ui.NewDiv(config.WINDOW_WIDTH, config.WINDOW_HEIGHT, 0, 0)
+	mainDiv := ui.NewDiv(config.WINDOW_WIDTH, config.WINDOW_HEIGHT, 0, 0, true)
 	g.components = append(g.components, *mainDiv)
 	// ------------------------------------------------------------------------
 
@@ -84,7 +84,7 @@ func (g *Game) InitUI() {
 	titleHeight := config.WINDOW_HEIGHT / 3
 	titleX := (config.WINDOW_WIDTH / 3) + PADDING
 	titleY := 20
-	titleDiv := ui.NewDiv(titleWidth, titleHeight, titleX, titleY)
+	titleDiv := ui.NewDiv(titleWidth, titleHeight, titleX, titleY, true)
 	titleText := ui.NewText("Byteborn", text.AlignCenter, text.AlignCenter)
 	titleDiv.AddChild(titleText)
 	g.components = append(g.components, *titleDiv)
@@ -95,7 +95,7 @@ func (g *Game) InitUI() {
 	logoHeight := config.WINDOW_HEIGHT / 3
 	logoX := 20
 	logoY := 20
-	logoDiv := ui.NewDiv(logoWidth, logoHeight, logoX, logoY)
+	logoDiv := ui.NewDiv(logoWidth, logoHeight, logoX, logoY, true)
 	g.components = append(g.components, *logoDiv)
 	// -------------------------------------------------------------------------
 
@@ -104,10 +104,9 @@ func (g *Game) InitUI() {
 	selectionHeight := (config.WINDOW_HEIGHT/3)*2 - 3*PADDING
 	selectionX := (config.WINDOW_WIDTH / 2) - (selectionWidth / 2)
 	selectionY := titleY + titleHeight + PADDING
-	selectionDiv := ui.NewDiv(selectionWidth, selectionHeight, selectionX, selectionY)
-	// TODO: 3 Buttons here
+	selectionDiv := ui.NewDiv(selectionWidth, selectionHeight, selectionX, selectionY, false)
 	bm := ui.NewButtonManager()
-	bm.AddNewButton("Start", false)
+	bm.AddNewButton("Start", true)
 	bm.AddNewButton("Settings", false)
 	bm.AddNewButton("Quit", false)
 	selectionDiv.AddChild(bm)
@@ -185,7 +184,21 @@ func (g *Game) handleMenuInput() {
 	}
 
 	if g.input.ENTER {
-		g.scene_state = INGAME
+		selectedButtonLabel := g.components[3].GetSelectedButtonLabel()
+
+		switch selectedButtonLabel {
+		case "Start":
+			g.scene_state = INGAME
+		case "Settings":
+		case "Quit":
+			os.Exit(0)
+		}
+	}
+
+	if g.input.ARROW_UP {
+		g.components[3].OnKeyPress(ebiten.KeyArrowUp)
+	} else if g.input.ARROW_DOWN {
+		g.components[3].OnKeyPress(ebiten.KeyArrowDown)
 	}
 }
 

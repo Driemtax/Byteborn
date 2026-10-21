@@ -26,16 +26,16 @@ type InputState struct {
 
 func GetInputState() *InputState {
 	return &InputState{
-		UP:          ebiten.IsKeyPressed(ebiten.KeyW),
-		DOWN:        ebiten.IsKeyPressed(ebiten.KeyS),
-		LEFT:        ebiten.IsKeyPressed(ebiten.KeyA),
-		RIGHT:       ebiten.IsKeyPressed(ebiten.KeyD),
-		LSHIFT:      ebiten.IsKeyPressed(ebiten.KeyShiftLeft),
-		ARROW_UP:    ebiten.IsKeyPressed(ebiten.KeyArrowUp),
-		ARROW_DOWN:  ebiten.IsKeyPressed(ebiten.KeyArrowDown),
-		ARROW_RIGHT: ebiten.IsKeyPressed(ebiten.KeyArrowRight),
-		ARROW_LEFT:  ebiten.IsKeyPressed(ebiten.KeyArrowLeft),
+		UP:     ebiten.IsKeyPressed(ebiten.KeyW),
+		DOWN:   ebiten.IsKeyPressed(ebiten.KeyS),
+		LEFT:   ebiten.IsKeyPressed(ebiten.KeyA),
+		RIGHT:  ebiten.IsKeyPressed(ebiten.KeyD),
+		LSHIFT: ebiten.IsKeyPressed(ebiten.KeyShiftLeft),
 
+		ARROW_UP:     inpututil.IsKeyJustPressed(ebiten.KeyArrowUp),
+		ARROW_DOWN:   inpututil.IsKeyJustPressed(ebiten.KeyArrowDown),
+		ARROW_RIGHT:  inpututil.IsKeyJustPressed(ebiten.KeyArrowRight),
+		ARROW_LEFT:   inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft),
 		ESC:          inpututil.IsKeyJustPressed(ebiten.KeyEscape),
 		ENTER:        inpututil.IsKeyJustPressed(ebiten.KeyEnter),
 		TOGGLE_DEBUG: inpututil.IsKeyJustPressed(ebiten.KeyF3),

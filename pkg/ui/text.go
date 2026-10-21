@@ -28,3 +28,11 @@ func (t *Text) Draw(screen *ebiten.Image, posX int, posY int, width int, height 
 	midY := posY + (height / 2)
 	t.font.Draw(screen, midX, midY, t.content, t.justificationX, t.justificationY)
 }
+
+func (t *Text) OnKeyPress(ebiten.Key) {
+
+}
+
+func (t *Text) GetSelectedButtonLabel() string {
+	return ""
+}
