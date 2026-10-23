@@ -95,7 +95,7 @@ func (g *Game) InitUI() {
 	logoHeight := config.WINDOW_HEIGHT / 3
 	logoX := 20
 	logoY := 20
-	logoDiv := ui.NewDiv(logoWidth, logoHeight, logoX, logoY, true)
+	logoDiv := ui.NewDiv(logoWidth, logoHeight, logoX, logoY, false)
 
 	pic := ui.NewPicture("assets/title_menu/Title_Monster.png")
 	logoDiv.AddChild(pic)

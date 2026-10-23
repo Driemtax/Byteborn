@@ -24,11 +24,16 @@ func NewPicture(path string) *Picture {
 
 func (img *Picture) Draw(screen *ebiten.Image, posX int, posY, width int, height int) {
 	op := &ebiten.DrawImageOptions{}
-	midX := posX + (width / 2) - (img.width / 2)
-	midY := posY + (height / 2) - (img.height / 2)
+	imgWidth := img.file.Bounds().Dx()
+	imgHeight := img.file.Bounds().Dy()
+	midX := posX + (width / 2) - (imgWidth + 15)
+	midY := posY + (height / 2) - (imgHeight)
 	op.GeoM.Translate(float64(midX), float64(midY))
+	op.GeoM.Scale(2.0, 2.0)
 
 	screen.DrawImage(img.file, op)
+	// Circle for debugging the centering
+	//vector.FillCircle(screen, float32(midX), float32(midY), 10.0, color.White, false)
 }
 
 // Will not be called
