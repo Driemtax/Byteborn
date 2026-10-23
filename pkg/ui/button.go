@@ -1,13 +1,10 @@
 package ui
 
 import (
-	"image/color"
-
 	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
 const (
@@ -23,6 +20,7 @@ type Button struct {
 	Id         int
 	Text       *Text
 	IsSelected bool
+	selector   *Triangle
 }
 
 func (bm *ButtonManager) GetSelectedButtonLabel() string {
@@ -85,6 +83,7 @@ func NewButton(content string, isSelected bool) *Button {
 	return &Button{
 		Text:       &Text{font: util.InitFont(), content: content, justificationX: text.AlignCenter, justificationY: text.AlignCenter},
 		IsSelected: isSelected,
+		selector:   NewTriangle(config.PRESS_START_2P_SIZE, config.PRESS_START_2P_SIZE),
 	}
 }
 
@@ -96,9 +95,12 @@ func (b *Button) Draw(screen *ebiten.Image, posX int, posY int, width int, heigh
 	//vector.StrokeRect(screen, float32(posX), float32(posY), float32(width), float32(height), 1, color.White, false)
 
 	if b.IsSelected {
+		selectorHeightHalf := b.selector.img.Bounds().Dy() / 2
 		selectorX := posX + 20
-		selectorY := posY + (height / 2)
-		vector.FillCircle(screen, float32(selectorX), float32(selectorY), config.PRESS_START_2P_SIZE/2, color.White, false)
+		selectorY := posY + (height / 2) - selectorHeightHalf
+		b.selector.Draw(screen, selectorX, selectorY, width, height)
+
+		//vector.FillCircle(screen, float32(selectorX), float32(selectorY), config.PRESS_START_2P_SIZE/2, color.White, false)
 	}
 
 	// Label of button
