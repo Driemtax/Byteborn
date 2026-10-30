@@ -37,4 +37,9 @@ const (
 	// --- F O N T S ---
 	// -----------------
 	PRESS_START_2P_SIZE = 8
+
+	// --------------
+	// --- ASSETS ---
+	// --------------
+	TITLE_LOGO_PATH = "assets/title_menu_Title_Monster.png"
 )

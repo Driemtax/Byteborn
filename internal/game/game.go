@@ -8,13 +8,13 @@ import (
 	"github.com/Driemtax/Byteborn/internal/debug"
 	"github.com/Driemtax/Byteborn/internal/player"
 	"github.com/Driemtax/Byteborn/internal/scene"
+	"github.com/Driemtax/Byteborn/internal/views"
 	"github.com/Driemtax/Byteborn/internal/world"
 	"github.com/Driemtax/Byteborn/pkg/input"
 	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/Driemtax/Byteborn/pkg/ui"
 	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
 const (
@@ -53,6 +53,7 @@ type Game struct {
 	// ui components
 	scene_state SCENE_STATE
 	components  []ui.Div
+	menuScreen  *views.MenuScreen
 }
 
 func NewGame() *Game {
@@ -65,58 +66,13 @@ func NewGame() *Game {
 		// UI
 		scene_state: INGAME,
 		components:  []ui.Div{},
+		menuScreen:  views.NewMenuScreen(),
 	}
 }
 
 func (g *Game) InitGame() {
-	g.InitUI()
+	g.menuScreen.Init()
 	g.scene_state = MENU
-}
-
-func (g *Game) InitUI() {
-	// --- MAIN DIV ---
-	mainDiv := ui.NewDiv(config.WINDOW_WIDTH, config.WINDOW_HEIGHT, 0, 0, true)
-	g.components = append(g.components, *mainDiv)
-	// ------------------------------------------------------------------------
-
-	// --- TITLE DIV ---
-	titleWidth := (config.WINDOW_WIDTH/3)*2 - 2*PADDING
-	titleHeight := config.WINDOW_HEIGHT / 3
-	titleX := (config.WINDOW_WIDTH / 3) + PADDING
-	titleY := 20
-	titleDiv := ui.NewDiv(titleWidth, titleHeight, titleX, titleY, true)
-	titleText := ui.NewText("Byteborn", text.AlignCenter, text.AlignCenter)
-	titleDiv.AddChild(titleText)
-	g.components = append(g.components, *titleDiv)
-	// -------------------------------------------------------------------------
-
-	// --- LOGO DIV ---
-	logoWidth := (config.WINDOW_WIDTH/3)*1 - PADDING
-	logoHeight := config.WINDOW_HEIGHT / 3
-	logoX := 20
-	logoY := 20
-	logoDiv := ui.NewDiv(logoWidth, logoHeight, logoX, logoY, false)
-
-	pic := ui.NewPicture("assets/title_menu/Title_Monster.png")
-	logoDiv.AddChild(pic)
-
-	g.components = append(g.components, *logoDiv)
-	// -------------------------------------------------------------------------
-
-	// --- BUTTONS DIV --
-	selectionWidth := config.WINDOW_WIDTH / 3
-	selectionHeight := (config.WINDOW_HEIGHT/3)*2 - 3*PADDING
-	selectionX := (config.WINDOW_WIDTH / 2) - (selectionWidth / 2)
-	selectionY := titleY + titleHeight + PADDING
-	selectionDiv := ui.NewDiv(selectionWidth, selectionHeight, selectionX, selectionY, false)
-	bm := ui.NewButtonManager()
-	bm.AddNewButton("Start", true)
-	bm.AddNewButton("Settings", false)
-	bm.AddNewButton("Quit", false)
-	selectionDiv.AddChild(bm)
-
-	g.components = append(g.components, *selectionDiv)
-
 }
 
 func (g *Game) HandleInput() (types.Vec2, error) {

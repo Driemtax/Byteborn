@@ -8,6 +8,7 @@ import (
 )
 
 type Div struct {
+	Component
 	components []Component
 
 	posX   int

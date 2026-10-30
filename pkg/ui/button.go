@@ -12,12 +12,20 @@ const (
 )
 
 type ButtonManager struct {
+	width  int
+	height int
+	posX   int
+	posY   int
+
 	Buttons        []Button
 	selectedButton int
 }
 
 type Button struct {
+	Component
+
 	Id         int
+	Label      string
 	Text       *Text
 	IsSelected bool
 	selector   *Triangle
@@ -32,8 +40,12 @@ func (b *Button) GetSelectedButtonLabel() string {
 }
 
 // Create a new button manager with no buttons in it and none selected represented by -1.
-func NewButtonManager() *ButtonManager {
+func NewButtonManager(width, height, posX, posY int) *ButtonManager {
 	return &ButtonManager{
+		width:          width,
+		height:         height,
+		posX:           posX,
+		posY:           posY,
 		Buttons:        []Button{},
 		selectedButton: -1,
 	}
