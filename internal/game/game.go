@@ -8,9 +8,12 @@ import (
 	"github.com/Driemtax/Byteborn/internal/debug"
 	"github.com/Driemtax/Byteborn/internal/player"
 	"github.com/Driemtax/Byteborn/internal/scene"
+	"github.com/Driemtax/Byteborn/internal/views"
 	"github.com/Driemtax/Byteborn/internal/world"
 	"github.com/Driemtax/Byteborn/pkg/input"
 	"github.com/Driemtax/Byteborn/pkg/types"
+	"github.com/Driemtax/Byteborn/pkg/ui"
+	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -22,6 +25,16 @@ const (
 	SCALED_HEIGHT = HEIGHT * SCALE
 
 	TPS = config.TPS
+
+	FONT_SIZE = config.PRESS_START_2P_SIZE
+	PADDING   = 20
+)
+
+type SCENE_STATE int
+
+const (
+	MENU SCENE_STATE = iota
+	INGAME
 )
 
 func init() {
@@ -31,18 +44,35 @@ func init() {
 }
 
 type Game struct {
+	font    *util.Font
 	player  *player.Player
 	input   *input.InputState
 	world   *world.World
 	overlay *debug.Overlay
+
+	// ui components
+	scene_state SCENE_STATE
+	components  []ui.Div
+	menuScreen  *views.MenuScreen
 }
 
 func NewGame() *Game {
 	return &Game{
+		font:    util.InitFont(),
 		player:  player.NewPlayer(),
 		world:   world.NewWorld(),
 		overlay: debug.NewOverlay(),
+
+		// UI
+		scene_state: INGAME,
+		components:  []ui.Div{},
+		menuScreen:  views.NewMenuScreen(),
 	}
+}
+
+func (g *Game) InitGame() {
+	g.menuScreen.Init()
+	g.scene_state = MENU
 }
 
 func (g *Game) HandleInput() (types.Vec2, error) {
@@ -96,9 +126,46 @@ func (g *Game) Update() error {
 		g.overlay.Toggle()
 	}
 
-	// Check for ESC
+	// Handle input accordingly to selected scene
+	switch g.scene_state {
+	case MENU:
+		g.handleMenuInput()
+	case INGAME:
+		g.handleIngameInput(dt)
+	}
+
+	return nil
+}
+
+func (g *Game) handleMenuInput() {
+	// TODO Handle Menu Input, so div.OnKeyPress or something or probably Menu struct which holds the div
 	if g.input.ESC {
 		os.Exit(0)
+	}
+
+	if g.input.ENTER {
+		selectedButtonLabel := g.components[3].GetSelectedButtonLabel()
+
+		switch selectedButtonLabel {
+		case "Start":
+			g.scene_state = INGAME
+		case "Settings":
+		case "Quit":
+			os.Exit(0)
+		}
+	}
+
+	if g.input.ARROW_UP {
+		g.components[3].OnKeyPress(ebiten.KeyArrowUp)
+	} else if g.input.ARROW_DOWN {
+		g.components[3].OnKeyPress(ebiten.KeyArrowDown)
+	}
+}
+
+func (g *Game) handleIngameInput(dt float64) {
+	// Check for ESC
+	if g.input.ESC {
+		g.scene_state = MENU
 	}
 
 	dir, err := g.HandleInput()
@@ -112,11 +179,27 @@ func (g *Game) Update() error {
 	g.player.IsRunning = false
 
 	g.world.UpdateCamera(g.player.Pos, dt)
-
-	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	// Draw components accordingly to the scene state
+
+	switch g.scene_state {
+	case MENU:
+		g.drawMenu(screen)
+	case INGAME:
+		g.drawIngame(screen)
+	}
+}
+
+func (g *Game) drawMenu(screen *ebiten.Image) {
+	// draw all divs to the screen
+	for _, d := range g.components {
+		d.Draw(screen)
+	}
+}
+
+func (g *Game) drawIngame(screen *ebiten.Image) {
 	g.world.Draw(screen)
 	g.player.Draw(screen, g.world.GetCameraPos())
 	g.drawDebugOverlay(screen)
