@@ -41,5 +41,5 @@ const (
 	// --------------
 	// --- ASSETS ---
 	// --------------
-	TITLE_LOGO_PATH = "assets/title_menu_Title_Monster.png"
+	TITLE_LOGO_PATH = "assets/title_menu/Title_Monster.png"
 )

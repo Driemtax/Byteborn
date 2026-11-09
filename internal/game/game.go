@@ -12,7 +12,6 @@ import (
 	"github.com/Driemtax/Byteborn/internal/world"
 	"github.com/Driemtax/Byteborn/pkg/input"
 	"github.com/Driemtax/Byteborn/pkg/types"
-	"github.com/Driemtax/Byteborn/pkg/ui"
 	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -52,27 +51,25 @@ type Game struct {
 
 	// ui components
 	scene_state SCENE_STATE
-	components  []ui.Div
 	menuScreen  *views.MenuScreen
 }
 
 func NewGame() *Game {
-	return &Game{
-		font:    util.InitFont(),
-		player:  player.NewPlayer(),
-		world:   world.NewWorld(),
-		overlay: debug.NewOverlay(),
-
-		// UI
-		scene_state: INGAME,
-		components:  []ui.Div{},
-		menuScreen:  views.NewMenuScreen(),
+	g := &Game{
+		font:        util.InitFont(),
+		player:      player.NewPlayer(),
+		world:       world.NewWorld(),
+		overlay:     debug.NewOverlay(),
+		scene_state: MENU,
 	}
-}
 
-func (g *Game) InitGame() {
-	g.menuScreen.Init()
-	g.scene_state = MENU
+	g.menuScreen = views.NewMenuScreen(views.MenuActions{
+		OnStart:    func() { g.scene_state = INGAME },
+		OnSettings: func() {},
+		OnQuit:     func() { os.Exit(0) },
+	})
+
+	return g
 }
 
 func (g *Game) HandleInput() (types.Vec2, error) {
@@ -129,37 +126,12 @@ func (g *Game) Update() error {
 	// Handle input accordingly to selected scene
 	switch g.scene_state {
 	case MENU:
-		g.handleMenuInput()
+		g.menuScreen.Update(g.input)
 	case INGAME:
 		g.handleIngameInput(dt)
 	}
 
 	return nil
-}
-
-func (g *Game) handleMenuInput() {
-	// TODO Handle Menu Input, so div.OnKeyPress or something or probably Menu struct which holds the div
-	if g.input.ESC {
-		os.Exit(0)
-	}
-
-	if g.input.ENTER {
-		selectedButtonLabel := g.components[3].GetSelectedButtonLabel()
-
-		switch selectedButtonLabel {
-		case "Start":
-			g.scene_state = INGAME
-		case "Settings":
-		case "Quit":
-			os.Exit(0)
-		}
-	}
-
-	if g.input.ARROW_UP {
-		g.components[3].OnKeyPress(ebiten.KeyArrowUp)
-	} else if g.input.ARROW_DOWN {
-		g.components[3].OnKeyPress(ebiten.KeyArrowDown)
-	}
 }
 
 func (g *Game) handleIngameInput(dt float64) {
@@ -194,9 +166,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) drawMenu(screen *ebiten.Image) {
 	// draw all divs to the screen
-	for _, d := range g.components {
-		d.Draw(screen)
-	}
+	g.menuScreen.Draw(screen)
 }
 
 func (g *Game) drawIngame(screen *ebiten.Image) {

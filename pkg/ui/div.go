@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"image"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -8,31 +9,17 @@ import (
 )
 
 type Div struct {
-	Component
+	Box
 	components []Component
-
-	posX   int
-	posY   int
-	width  int
-	height int
 
 	isWireframed bool
 }
 
-func NewDiv(width, height, posX, posY int, isWireFramed bool) *Div {
+func NewDiv(isWireFramed bool) *Div {
 	return &Div{
 		components:   []Component{},
-		width:        width,
-		height:       height,
-		posX:         posX,
-		posY:         posY,
 		isWireframed: isWireFramed,
 	}
-}
-
-// This only works on the button div. Care, this can break the whole application
-func (d *Div) GetSelectedButtonLabel() string {
-	return d.components[0].GetSelectedButtonLabel()
 }
 
 func (d *Div) AddChild(c Component) {
@@ -40,32 +27,71 @@ func (d *Div) AddChild(c Component) {
 }
 
 // This for now only works for the button div in the main menu
-func (d *Div) OnKeyPress(key ebiten.Key) {
-	d.components[0].OnKeyPress(key)
+func (d *Div) OnKeyPress(key ebiten.Key) bool {
+	for _, c := range d.components {
+		if h, ok := c.(KeyPressHandler); ok && h.OnKeyPress(key) {
+			return true
+		}
+	}
+	return false
 }
 
-func (d *Div) Update(posX, posY int) {
-	// input is the middle of the screen now still need to center the div
-	newX := posX - (d.width / 2)
-	newY := posY - (d.height / 2)
+// Adapting the layout of a div also adapts the position and size of all its child components. Previous scale is secured.
+func (d *Div) Layout(bounds image.Rectangle) {
+	parentBounds := d.bounds
+	d.bounds = bounds
 
-	d.posX = newX
-	d.posY = newY
+	// Check if the div has child components. If not just return here
+	childCount := len(d.components)
+	if childCount <= 0 {
+		return
+	}
+
+	if childCount == 1 {
+		d.components[0].Layout(bounds)
+	}
+
+	// If there are child components save the relative size of each child in comparison to the parent div and reapply it afterwards
+	oldParentWidth := parentBounds.Bounds().Dx()
+	if oldParentWidth == 0 {
+		oldParentWidth = bounds.Dx()
+	}
+
+	oldParentHeight := parentBounds.Bounds().Dy()
+	if oldParentHeight == 0 {
+		oldParentHeight = bounds.Dy()
+	}
+	// The difference in parent Position is needed to calculate the new position of each children.
+	parentXDiff := bounds.Min.X - parentBounds.Min.X
+	parentYDiff := bounds.Min.Y - parentBounds.Min.Y
+
+	// so the idea here is to calculate the relative width and height of the child in comparison to the old parents width and height.
+	// and then reapply this factor to the new width and height of the parent, so the child gets scaled correctly.
+	for _, c := range d.components {
+		childBounds := c.Bounds()
+		childWidth := childBounds.Dx()
+		childHeight := childBounds.Dy()
+		childWidthRelativeFactor := float32(childWidth) / float32(oldParentWidth)
+		childHeightRelativeFactor := float32(childHeight) / float32(oldParentHeight)
+
+		newChildX := childBounds.Min.X + parentXDiff
+		newChildY := childBounds.Min.Y + parentYDiff
+		newChildWidth := int(float32(bounds.Dx()) * childWidthRelativeFactor)
+		newChildHeight := int(float32(bounds.Dy()) * childHeightRelativeFactor)
+		childNewBounds := image.Rect(newChildX, newChildY, newChildX+newChildWidth, newChildY+newChildHeight)
+
+		c.Layout(childNewBounds)
+	}
+
 }
 
 func (d *Div) Draw(screen *ebiten.Image) {
 	if d.isWireframed {
 		// Draw a white border for the whole div to make it visible
-		vector.StrokeRect(screen, float32(d.posX), float32(d.posY), float32(d.width), float32(d.height), 2.0, color.White, false)
+		vector.StrokeRect(screen, float32(d.bounds.Min.X), float32(d.bounds.Min.Y), float32(d.bounds.Dx()), float32(d.bounds.Dy()), 2.0, color.White, false)
 	}
 
-	// Draw text in the middle of the div
-	//x := (d.width / 2) + d.posX
-	//y := (d.height / 2) + d.posY
-	x := d.posX
-	y := d.posY
-
 	for _, c := range d.components {
-		c.Draw(screen, x, y, d.width, d.height)
+		c.Draw(screen)
 	}
 }

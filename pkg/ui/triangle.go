@@ -6,6 +6,7 @@ import (
 )
 
 type Triangle struct {
+	Box
 	img *ebiten.Image
 }
 
@@ -33,18 +34,8 @@ func NewTriangle(width, height int) *Triangle {
 	}
 }
 
-func (t *Triangle) Draw(screen *ebiten.Image, posX int, posY int, width int, height int) {
+func (t *Triangle) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(float64(posX), float64(posY))
+	op.GeoM.Translate(float64(t.bounds.Min.X), float64(t.bounds.Min.Y))
 	screen.DrawImage(t.img, op)
-}
-
-// Will not be called
-func (t *Triangle) OnKeyPress(ebiten.Key) {
-
-}
-
-// Will not be called
-func (t *Triangle) GetSelectedButtonLabel() string {
-	return ""
 }

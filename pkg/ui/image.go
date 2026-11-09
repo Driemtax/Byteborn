@@ -6,6 +6,7 @@ import (
 )
 
 type Picture struct {
+	Box
 	file   *ebiten.Image
 	width  int
 	height int
@@ -22,26 +23,16 @@ func NewPicture(path string) *Picture {
 	}
 }
 
-func (img *Picture) Draw(screen *ebiten.Image, posX int, posY, width int, height int) {
+func (img *Picture) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
-	imgWidth := img.file.Bounds().Dx()
-	imgHeight := img.file.Bounds().Dy()
-	midX := posX + (width / 2) - (imgWidth + 15)
-	midY := posY + (height / 2) - (imgHeight)
-	op.GeoM.Translate(float64(midX), float64(midY))
+	picBounds := img.bounds
+	imgBounds := img.file.Bounds()
+	widthDiff := picBounds.Dx() - imgBounds.Dx()
+	centerX := (widthDiff / 2) - 15
 	op.GeoM.Scale(2.0, 2.0)
+	op.GeoM.Translate(float64(centerX), 0.0)
 
 	screen.DrawImage(img.file, op)
 	// Circle for debugging the centering
-	//vector.FillCircle(screen, float32(midX), float32(midY), 10.0, color.White, false)
-}
-
-// Will not be called
-func (img *Picture) OnKeyPress(ebiten.Key) {
-
-}
-
-// Will not be called
-func (img *Picture) GetSelectedButtonLabel() string {
-	return ""
+	//vector.FillCircle(screen, float32(centerX), float32(midY), 10.0, color.White, false)
 }

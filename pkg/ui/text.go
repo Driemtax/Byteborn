@@ -7,6 +7,7 @@ import (
 )
 
 type Text struct {
+	Box
 	font    *util.Font
 	content string
 
@@ -23,16 +24,8 @@ func NewText(msg string, justificationX text.Align, justificationY text.Align) *
 	}
 }
 
-func (t *Text) Draw(screen *ebiten.Image, posX int, posY int, width int, height int) {
-	midX := posX + (width / 2)
-	midY := posY + (height / 2)
-	t.font.Draw(screen, midX, midY, t.content, t.justificationX, t.justificationY)
-}
-
-func (t *Text) OnKeyPress(ebiten.Key) {
-
-}
-
-func (t *Text) GetSelectedButtonLabel() string {
-	return ""
+func (t *Text) Draw(screen *ebiten.Image) {
+	//midX := (t.bounds.Min.X + t.bounds.Max.X) / 2
+	//midY := (t.bounds.Min.Y + t.bounds.Max.Y) / 2
+	t.font.Draw(screen, t.bounds.Min.X, t.bounds.Min.Y, t.content, t.justificationX, t.justificationY)
 }
