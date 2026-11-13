@@ -56,7 +56,7 @@ func (menu *MenuScreen) Init() {
 	logoHeight := config.WINDOW_HEIGHT / 3
 	logoX := 20
 	logoY := 20
-	logoDiv := ui.NewDiv(true)
+	logoDiv := ui.NewDiv(false)
 
 	pic := ui.NewPicture(config.TITLE_LOGO_PATH)
 	logoDiv.AddChild(pic)
