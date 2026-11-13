@@ -32,4 +32,9 @@ const (
 	PLAYER_SPEED               = 2.0
 	ANIMATION_UPDATE_INTERVALL = 300 // How often the animation updates in ms
 	TICK_UPDATE                = TPS * (float64(ANIMATION_UPDATE_INTERVALL) / 1000.0)
+
+	// --------------
+	// --- ENTITY ---
+	// --------------
+	ENTITY_SPEED = 2.0
 )

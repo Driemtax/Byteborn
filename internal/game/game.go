@@ -6,6 +6,7 @@ import (
 
 	"github.com/Driemtax/Byteborn/internal/config"
 	"github.com/Driemtax/Byteborn/internal/debug"
+	"github.com/Driemtax/Byteborn/internal/entity"
 	"github.com/Driemtax/Byteborn/internal/player"
 	"github.com/Driemtax/Byteborn/internal/scene"
 	"github.com/Driemtax/Byteborn/internal/world"
@@ -31,17 +32,19 @@ func init() {
 }
 
 type Game struct {
-	player  *player.Player
-	input   *input.InputState
-	world   *world.World
-	overlay *debug.Overlay
+	player     *player.Player
+	testMonser *entity.Penguin
+	input      *input.InputState
+	world      *world.World
+	overlay    *debug.Overlay
 }
 
 func NewGame() *Game {
 	return &Game{
-		player:  player.NewPlayer(),
-		world:   world.NewWorld(),
-		overlay: debug.NewOverlay(),
+		player:     player.NewPlayer(),
+		testMonser: entity.NewPenguin(),
+		world:      world.NewWorld(),
+		overlay:    debug.NewOverlay(),
 	}
 }
 
@@ -88,6 +91,8 @@ func (g *Game) Update() error {
 	// Update player animation count
 	g.player.UpdateAC()
 	g.player.UpdateLookDirection()
+	g.testMonser.UpdateAC()
+	g.testMonser.UpdateLookDirection()
 
 	g.input = input.GetInputState()
 
@@ -107,6 +112,10 @@ func (g *Game) Update() error {
 		log.Fatal(err)
 	}
 	g.player.Move(dir)
+	g.testMonser.LastDirection = g.player.LastDirection
+	g.testMonser.IsMoving = g.player.IsMoving
+	g.testMonser.IsRunning = g.player.IsRunning
+	g.testMonser.Move(dir)
 
 	// Reset running every frame
 	g.player.IsRunning = false
@@ -119,6 +128,7 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.world.Draw(screen)
 	g.player.Draw(screen, g.world.GetCameraPos())
+	g.testMonser.Draw(screen, g.world.GetCameraPos())
 	g.drawDebugOverlay(screen)
 }
 
