@@ -147,3 +147,8 @@ func (v Vec2) Normalize() Vec2 {
 func (v Vec2) Trunc() Vec2 {
 	return Vec2{X: math.Trunc(v.X), Y: math.Trunc(v.Y)}
 }
+
+// Returns a vector with absolute values of v
+func (v Vec2) Absolute() Vec2 {
+	return Vec2{X: math.Abs(v.X), Y: math.Abs(v.Y)}
+}

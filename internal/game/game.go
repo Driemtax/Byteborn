@@ -1,7 +1,6 @@
 package game
 
 import (
-	"log"
 	"os"
 
 	"github.com/Driemtax/Byteborn/internal/config"
@@ -11,7 +10,6 @@ import (
 	"github.com/Driemtax/Byteborn/internal/scene"
 	"github.com/Driemtax/Byteborn/internal/world"
 	"github.com/Driemtax/Byteborn/pkg/input"
-	"github.com/Driemtax/Byteborn/pkg/types"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -33,7 +31,7 @@ func init() {
 
 type Game struct {
 	player     *player.Player
-	testMonser *entity.Penguin
+	testMonser *entity.Monster
 	input      *input.InputState
 	world      *world.World
 	overlay    *debug.Overlay
@@ -42,57 +40,14 @@ type Game struct {
 func NewGame() *Game {
 	return &Game{
 		player:     player.NewPlayer(),
-		testMonser: entity.NewPenguin(),
+		testMonser: entity.NewMonster("penguin"),
 		world:      world.NewWorld(),
 		overlay:    debug.NewOverlay(),
 	}
 }
 
-func (g *Game) HandleInput() (types.Vec2, error) {
-	// reset walking status of player
-	g.player.IsMoving = false
-	var err error
-
-	if g.input.LSHIFT {
-		g.player.IsRunning = true
-	}
-
-	direction := types.NewVector2D(0, 0)
-
-	// Directions: TODO: explanation
-	if g.input.UP {
-		direction = direction.Add(types.NewVector2D(0, -1))
-	}
-
-	if g.input.DOWN {
-		direction = direction.Add(types.NewVector2D(0, 1))
-	}
-
-	if g.input.RIGHT {
-		direction = direction.Add(types.NewVector2D(1, 0))
-	}
-
-	if g.input.LEFT {
-		direction = direction.Add(types.NewVector2D(-1, 0))
-	}
-
-	// Set the player IsMoving for walking animation
-	if direction.LengthSq() > 0 {
-		g.player.IsMoving = true
-		g.player.LastDirection = direction
-	}
-
-	return direction, err
-}
-
 func (g *Game) Update() error {
 	dt := 1.0 / float64(ebiten.TPS())
-
-	// Update player animation count
-	g.player.UpdateAC()
-	g.player.UpdateLookDirection()
-	g.testMonser.UpdateAC()
-	g.testMonser.UpdateLookDirection()
 
 	g.input = input.GetInputState()
 
@@ -106,19 +61,8 @@ func (g *Game) Update() error {
 		os.Exit(0)
 	}
 
-	dir, err := g.HandleInput()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	g.player.Move(dir)
-	g.testMonser.LastDirection = g.player.LastDirection
-	g.testMonser.IsMoving = g.player.IsMoving
-	g.testMonser.IsRunning = g.player.IsRunning
-	g.testMonser.Move(dir)
-
-	// Reset running every frame
-	g.player.IsRunning = false
+	g.player.Update(*g.input)
+	g.testMonser.Update(g.player.Pos)
 
 	g.world.UpdateCamera(g.player.Pos, dt)
 
