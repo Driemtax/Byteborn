@@ -1,0 +1,41 @@
+package ui
+
+import (
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/vector"
+)
+
+type Triangle struct {
+	Box
+	img *ebiten.Image
+}
+
+func NewTriangle(width, height int) *Triangle {
+	new_img := ebiten.NewImage(width, height)
+	actualWidth := width
+
+	// width need to be an odd number to draw a rectangle otherwise the tip is missing
+	if width%2 == 0 {
+		actualWidth += 1
+	}
+
+	p := &vector.Path{}
+	p.MoveTo(0, 0)
+	p.LineTo(float32(actualWidth), float32(height/2))
+	p.LineTo(0, float32(height))
+	p.Close()
+
+	vector.FillPath(new_img, p, &vector.FillOptions{}, &vector.DrawPathOptions{
+		AntiAlias:  true,
+		ColorScale: ebiten.ColorScale{},
+	})
+	return &Triangle{
+		img: new_img,
+	}
+}
+
+func (t *Triangle) Draw(screen *ebiten.Image) {
+	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(float64(t.bounds.Min.X), float64(t.bounds.Min.Y))
+	screen.DrawImage(t.img, op)
+}

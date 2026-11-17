@@ -8,9 +8,11 @@ import (
 	"github.com/Driemtax/Byteborn/internal/debug"
 	"github.com/Driemtax/Byteborn/internal/player"
 	"github.com/Driemtax/Byteborn/internal/scene"
+	"github.com/Driemtax/Byteborn/internal/views"
 	"github.com/Driemtax/Byteborn/internal/world"
 	"github.com/Driemtax/Byteborn/pkg/input"
 	"github.com/Driemtax/Byteborn/pkg/types"
+	"github.com/Driemtax/Byteborn/pkg/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -22,6 +24,16 @@ const (
 	SCALED_HEIGHT = HEIGHT * SCALE
 
 	TPS = config.TPS
+
+	FONT_SIZE = config.PRESS_START_2P_SIZE
+	PADDING   = 20
+)
+
+type SCENE_STATE int
+
+const (
+	MENU SCENE_STATE = iota
+	INGAME
 )
 
 func init() {
@@ -31,18 +43,33 @@ func init() {
 }
 
 type Game struct {
+	font    *util.Font
 	player  *player.Player
 	input   *input.InputState
 	world   *world.World
 	overlay *debug.Overlay
+
+	// ui components
+	scene_state SCENE_STATE
+	menuScreen  *views.MenuScreen
 }
 
 func NewGame() *Game {
-	return &Game{
-		player:  player.NewPlayer(),
-		world:   world.NewWorld(),
-		overlay: debug.NewOverlay(),
+	g := &Game{
+		font:        util.InitFont(),
+		player:      player.NewPlayer(),
+		world:       world.NewWorld(),
+		overlay:     debug.NewOverlay(),
+		scene_state: MENU,
 	}
+
+	g.menuScreen = views.NewMenuScreen(views.MenuActions{
+		OnStart:    func() { g.scene_state = INGAME },
+		OnSettings: func() {},
+		OnQuit:     func() { os.Exit(0) },
+	})
+
+	return g
 }
 
 func (g *Game) HandleInput() (types.Vec2, error) {
@@ -96,9 +123,21 @@ func (g *Game) Update() error {
 		g.overlay.Toggle()
 	}
 
+	// Handle input accordingly to selected scene
+	switch g.scene_state {
+	case MENU:
+		g.menuScreen.Update(g.input)
+	case INGAME:
+		g.handleIngameInput(dt)
+	}
+
+	return nil
+}
+
+func (g *Game) handleIngameInput(dt float64) {
 	// Check for ESC
 	if g.input.ESC {
-		os.Exit(0)
+		g.scene_state = MENU
 	}
 
 	dir, err := g.HandleInput()
@@ -112,11 +151,25 @@ func (g *Game) Update() error {
 	g.player.IsRunning = false
 
 	g.world.UpdateCamera(g.player.Pos, dt)
-
-	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	// Draw components accordingly to the scene state
+
+	switch g.scene_state {
+	case MENU:
+		g.drawMenu(screen)
+	case INGAME:
+		g.drawIngame(screen)
+	}
+}
+
+func (g *Game) drawMenu(screen *ebiten.Image) {
+	// draw all divs to the screen
+	g.menuScreen.Draw(screen)
+}
+
+func (g *Game) drawIngame(screen *ebiten.Image) {
 	g.world.Draw(screen)
 	g.player.Draw(screen, g.world.GetCameraPos())
 	g.drawDebugOverlay(screen)

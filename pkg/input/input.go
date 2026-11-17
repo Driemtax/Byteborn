@@ -12,6 +12,13 @@ type InputState struct {
 	LEFT   bool
 	LSHIFT bool
 	ESC    bool
+	ENTER  bool
+
+	// Menu
+	ARROW_UP    bool
+	ARROW_DOWN  bool
+	ARROW_RIGHT bool
+	ARROW_LEFT  bool
 
 	// DEBUG TOGGLE
 	TOGGLE_DEBUG bool
@@ -25,7 +32,12 @@ func GetInputState() *InputState {
 		RIGHT:  ebiten.IsKeyPressed(ebiten.KeyD),
 		LSHIFT: ebiten.IsKeyPressed(ebiten.KeyShiftLeft),
 
+		ARROW_UP:     inpututil.IsKeyJustPressed(ebiten.KeyArrowUp),
+		ARROW_DOWN:   inpututil.IsKeyJustPressed(ebiten.KeyArrowDown),
+		ARROW_RIGHT:  inpututil.IsKeyJustPressed(ebiten.KeyArrowRight),
+		ARROW_LEFT:   inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft),
 		ESC:          inpututil.IsKeyJustPressed(ebiten.KeyEscape),
+		ENTER:        inpututil.IsKeyJustPressed(ebiten.KeyEnter),
 		TOGGLE_DEBUG: inpututil.IsKeyJustPressed(ebiten.KeyF3),
 	}
 }

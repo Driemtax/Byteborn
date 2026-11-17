@@ -11,6 +11,7 @@ import (
 func main() {
 	fmt.Println("Welcome to ByteBorn")
 	testGame := game.NewGame()
+
 	if err := ebiten.RunGame(testGame); err != nil {
 		log.Fatal(err)
 	}
